@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}게시글 수정{% endblock %}
+{% block content %}
+<a class="back-link" href="{{ url_for('posts.detail', post_id=post.id) }}">← 상세로 돌아가기</a><section class="content-card form-card"><p class="eyebrow">EDIT STORY NO. {{ post.id }}</p><h1>이야기를 조금 더 다듬어볼까요?</h1><p class="lead">수정한 내용은 저장 버튼을 눌러야 반영됩니다.</p>
+{% set form_action = url_for('posts.edit', post_id=post.id) %}{% set cancel_url = url_for('posts.detail', post_id=post.id) %}{% set submit_label = '수정 저장' %}{% include '_post_form.html' %}</section>
+{% endblock %}

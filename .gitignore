@@ -1,0 +1,12 @@
+.venv/
+.cache/
+__pycache__/
+.pytest_cache/
+*.pyc
+.env
+*.log
+*.jsonl
+*.zip
+*.zip.tmp
+*.bundle
+mini-watch/general/instance/

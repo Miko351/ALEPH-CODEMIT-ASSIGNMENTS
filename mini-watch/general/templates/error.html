@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}오류 안내{% endblock %}
+{% block content %}
+<section class="content-card confirmation-card"><span class="error-code">{{ status_code }}</span><h1>{{ message }}</h1><p class="lead">{{ description }}</p><a class="button" href="{{ url_for('posts.index') }}">목록으로 돌아가기 →</a></section>
+{% endblock %}
