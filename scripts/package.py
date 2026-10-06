@@ -32,6 +32,7 @@ def main() -> None:
             "index", "detail", "new", "edit", "delete", "error"
         ]}
         assert required.issubset(archive.namelist())
+        assert "posts-crud/mini-watch/monitor/backend/app.py" in archive.namelist()
     staging.replace(destination)
     print(f"Created {destination} ({count} files; {destination.stat().st_size:,} bytes)")
 

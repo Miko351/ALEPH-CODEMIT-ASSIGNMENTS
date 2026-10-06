@@ -1,6 +1,5 @@
 """Optional Windows-only portable PostgreSQL, scoped to this project's cache."""
 import argparse
-from contextlib import closing
 import os
 from pathlib import Path
 import secrets
@@ -11,8 +10,8 @@ import urllib.request
 import zipfile
 
 from dotenv import dotenv_values
-import psycopg2
-from psycopg2 import sql
+import psycopg
+from psycopg import sql
 
 ROOT = Path(__file__).resolve().parents[1]
 CACHE = ROOT / ".cache"
@@ -94,14 +93,13 @@ def setup() -> None:
         finally:
             password_file.unlink(missing_ok=True)
     start()
-    with closing(psycopg2.connect(
-        host="127.0.0.1", port=PORT, user="postgres", password=password, dbname="postgres"
-    )) as connection:
-        connection.autocommit = True
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT 1 FROM pg_database WHERE datname = %s", ("mini_watch",))
+    with psycopg.connect(
+        host="127.0.0.1", port=PORT, user="postgres", password=password,
+        dbname="postgres", autocommit=True,
+    ) as conn:
+        with conn.execute("SELECT 1 FROM pg_database WHERE datname = %s", ("mini_watch",)) as cursor:
             if cursor.fetchone() is None:
-                cursor.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier("mini_watch")))
+                conn.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier("mini_watch")))
     if not ENV.exists():
         ENV.write_text(
             f"DATABASE_URL=postgresql://postgres:{password}@127.0.0.1:{PORT}/mini_watch\n"

@@ -1,6 +1,9 @@
 import importlib.util
 import json
+import os
 from pathlib import Path
+import subprocess
+import sys
 from threading import Thread
 
 from bs4 import BeautifulSoup
@@ -161,7 +164,7 @@ def test_unknown_url_returns_error_template(client):
 
 
 def test_actual_monitor_collects_board_requests_without_form_data(application, client, tmp_path):
-    monitor_source = Path(__file__).resolve().parents[1] / "mini-watch" / "monitor" / "app.py"
+    monitor_source = Path(__file__).resolve().parents[1] / "mini-watch" / "monitor" / "backend" / "app.py"
     spec = importlib.util.spec_from_file_location("sample_monitor", monitor_source)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -196,3 +199,30 @@ def test_monitor_unavailable_does_not_block_crud(application, client, monkeypatc
     application.config["MONITOR_URL"] = "http://127.0.0.1:1/logs"
     assert client.get("/").status_code == 200
     assert client.post("/board/new", data={"title": "제목", "body": "내용"}).status_code == 303
+
+
+def test_committed_post_is_readable_in_a_new_application_process(application, client, tmp_path):
+    post_id = add_post(client, "재시작 후에도 남는 글", "PostgreSQL에 영구 저장된 내용")
+    environment = os.environ.copy()
+    environment["POSTS_TEST_DATABASE_URL"] = application.config["DATABASE_URL"]
+    environment["POSTS_TEST_LOG_PATH"] = str(tmp_path / "new-process.log")
+    environment["POSTS_TEST_POST_ID"] = str(post_id)
+    code = """
+import os
+from app import create_app
+app = create_app({
+    'TESTING': True,
+    'DATABASE_URL': os.environ['POSTS_TEST_DATABASE_URL'],
+    'MONITOR_URL': '',
+    'REQUEST_LOG_PATH': os.environ['POSTS_TEST_LOG_PATH'],
+})
+response = app.test_client().get('/board/' + os.environ['POSTS_TEST_POST_ID'])
+assert response.status_code == 200
+assert '재시작 후에도 남는 글' in response.get_data(as_text=True)
+assert 'PostgreSQL에 영구 저장된 내용' in response.get_data(as_text=True)
+"""
+    general = Path(__file__).resolve().parents[1] / "mini-watch" / "general"
+    subprocess.run(
+        [sys.executable, "-c", code], cwd=general, env=environment,
+        check=True, capture_output=True, timeout=20,
+    )

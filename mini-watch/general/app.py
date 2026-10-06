@@ -4,7 +4,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from flask import Flask, render_template
-import psycopg2
+import psycopg
 from werkzeug.exceptions import HTTPException
 
 from request_logging import register_request_logging
@@ -33,7 +33,7 @@ def create_app(config: dict | None = None) -> Flask:
             description="주소와 요청 내용을 확인한 뒤 다시 시도해 주세요.",
         ), error.code
 
-    @app.errorhandler(psycopg2.Error)
+    @app.errorhandler(psycopg.Error)
     def database_error(error):
         app.logger.exception("PostgreSQL request failed")
         return render_template(

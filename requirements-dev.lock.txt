@@ -14,7 +14,8 @@ MarkupSafe==3.0.4
 packaging==26.3
 playwright==1.63.0
 pluggy==1.6.0
-psycopg2-binary==2.9.13
+psycopg==3.3.6
+psycopg-binary==3.3.6
 pyee==13.0.1
 Pygments==2.21.0
 pytest==9.1.1
@@ -22,5 +23,6 @@ python-dotenv==1.2.4
 requests==2.34.2
 soupsieve==2.10
 typing_extensions==4.16.0
+tzdata==2026.5
 urllib3==2.8.0
 Werkzeug==3.1.9

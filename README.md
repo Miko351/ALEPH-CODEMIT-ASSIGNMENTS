@@ -4,7 +4,7 @@
 게시판 코드: `mini-watch/general/`  
 업로드 파일: 프로젝트 폴더 안의 `posts-crud.zip`
 
-기존 mini-watch 프로젝트 경로가 없다는 확인을 받아 **새 프로젝트로 구성**했습니다. 새 `db.py`에 `connect_db()`를 정의하고 모든 게시글 DB 함수가 이를 사용합니다. 기존 로그인·DB 설정·SQL·연습 파일·감시 서비스가 제공되지 않았으므로 해당 파일을 덮어쓰거나 삭제한 것은 없습니다. `mini-watch/monitor/`는 새 프로젝트의 요청 기록 수집을 확인하는 예제 감시 서비스입니다. 기존 수업 프로젝트를 전달받으면 원래 연결 설정과 감시 프로토콜에 맞춰 통합할 수 있습니다.
+기존 mini-watch 프로젝트가 없다는 확인을 받아 새 프로젝트로 구성했습니다. 게시판은 `mini-watch/general/`, 감시 서비스는 `mini-watch/monitor/backend/`에서 관리합니다. 모든 게시글 DB 함수는 `db.py`의 `connect_db()`를 사용합니다.
 
 ## 실행
 
@@ -66,7 +66,7 @@ cd D:\ALEPH_Codemit\posts-crud
 
 ```powershell
 cd D:\ALEPH_Codemit\posts-crud
-.\.venv\Scripts\python.exe mini-watch/monitor/app.py
+.\.venv\Scripts\python.exe mini-watch/monitor/backend/app.py
 ```
 
 - [게시판 목록](http://127.0.0.1:5000/)
@@ -106,7 +106,10 @@ posts-crud/
 │  │  ├─ templates/            # 필수 6개 화면, 공통 레이아웃·폼
 │  │  ├─ static/style.css
 │  │  └─ sql/001_posts.sql      # 신규 DB용 테이블·시퀀스 생성
-│  └─ monitor/app.py            # 새 프로젝트용 감시 서비스
+│  └─ monitor/
+│     └─ backend/
+│        ├─ app.py              # 감시 서비스, JSON 기록 수집
+│        └─ requirements.txt
 ├─ scripts/                    # DB 초기화, 로컬 PostgreSQL, ZIP 생성
 ├─ tests/                      # 실제 PostgreSQL 및 브라우저 테스트
 ├─ requirements-dev.lock.txt
@@ -114,13 +117,11 @@ posts-crud/
 └─ README.md
 ```
 
-SQL 입력값은 모두 `%s`와 매개변수로 전달합니다. DB 함수는 데이터 또는 `None`만 반환하고 HTTP 응답을 만들지 않습니다. 연결과 커서는 닫히며 변경은 트랜잭션에서 커밋되고 예외가 발생하면 롤백됩니다. Jinja2의 자동 이스케이프를 유지해 제목·본문의 HTML을 실행하지 않습니다.
+DB 연결은 `import psycopg`와 `psycopg.connect()`를 사용합니다. 게시글 CRUD는 `conn.execute()`로 SQL을 실행하고 `fetchall()`·`fetchone()`으로 결과를 받습니다. SQL 입력값은 모두 `%s`와 매개변수로 전달합니다. DB 함수는 데이터 또는 `None`만 반환하고 HTTP 응답을 만들지 않습니다. 연결과 커서는 닫히며 변경은 트랜잭션에서 커밋되고 예외가 발생하면 롤백됩니다. Jinja2의 자동 이스케이프를 유지해 제목·본문의 HTML을 실행하지 않습니다.
 
 선택 실습인 로그인 판정 화면은 추가하지 않았습니다. 게시판에 로그인 접근 제한이나 세션 기능도 없습니다.
 
 ## 검증
-
-2026-10-06 검증 결과: PostgreSQL 18.6에서 통합 테스트 **24개 통과**, 실제 데스크톱·모바일 Chromium 흐름 **2개 통과**, Python 컴파일 통과. 기존 테이블이 있을 때 초기화 명령이 테이블과 시퀀스를 변경하지 않는 것도 확인했습니다.
 
 테스트는 SQLite나 모의 DB가 아니라 **실제 PostgreSQL**을 사용합니다. 각 테스트마다 무작위 `test_posts_...` 스키마를 생성해 격리하고 종료 시 해당 테스트 스키마만 정리합니다. 일반 게시판의 `public.posts`는 변경하지 않습니다. 테스트 계정에는 테스트 스키마 생성 권한이 필요합니다.
 
@@ -140,7 +141,7 @@ $env:PLAYWRIGHT_BROWSERS_PATH = 'D:\ALEPH_Codemit\posts-crud\.cache\ms-playwrigh
 .\.venv\Scripts\python.exe -m pytest -q -m browser --basetemp .cache/pytest-browser
 ```
 
-완료 기준별 테스트는 `CHECKLIST.md`에 정리했습니다. 직접 테스트할 때는 목록 → 작성 → 상세 → 새로고침 → 목록 → 수정 → 삭제 확인 → 취소 → 삭제 확인 → 삭제 순서로 확인하면 됩니다. 공백 입력의 400과 삭제 후 404도 확인하세요.
+직접 테스트할 때는 목록 → 작성 → 상세 → 새로고침 → 목록 → 수정 → 삭제 확인 → 취소 → 삭제 확인 → 삭제 순서로 확인하면 됩니다. 공백 입력의 400과 삭제 후 404도 확인하세요. 자동 테스트에는 새 앱 프로세스로 저장한 글을 조회하는 데이터 유지 검증도 포함되어 있습니다.
 
 ## Git과 ZIP
 
@@ -156,4 +157,4 @@ ZIP에는 `posts-crud.bundle`도 넣어 **실제 Git 커밋 이력**을 전달�
 
 `posts-crud.zip`에는 소스·테스트·SQL·설정 예시·실행 안내와 lock 파일을 넣습니다. `.env`, 로그, 회원·게시글 데이터, PostgreSQL 바이너리, 가상환경, 캐시, `.git`은 제외합니다. 압축 무결성·Python 문법·필수 템플릿 존재도 검사합니다.
 
-공식 참고 문서: [Flask Blueprint](https://flask.palletsprojects.com/en/stable/blueprints/), [Psycopg SQL 매개변수와 트랜잭션](https://www.psycopg.org/docs/usage), [EDB PostgreSQL 바이너리](https://www.enterprisedb.com/download-postgresql-binaries).
+공식 참고 문서: [Flask Blueprint](https://flask.palletsprojects.com/en/stable/blueprints/), [Psycopg 3 연결·SQL 실행·트랜잭션](https://www.psycopg.org/psycopg3/docs/basic/usage.html), [EDB PostgreSQL 바이너리](https://www.enterprisedb.com/download-postgresql-binaries).
