@@ -12,6 +12,7 @@ import zipfile
 from dotenv import dotenv_values
 import psycopg
 from psycopg import sql
+from configure_session import configure
 
 ROOT = Path(__file__).resolve().parents[1]
 CACHE = ROOT / ".cache"
@@ -117,6 +118,7 @@ def setup() -> None:
             encoding="utf-8",
         )
         print("Created monitor/backend/.env with project database credentials.")
+    configure()
 
 
 def main() -> None:

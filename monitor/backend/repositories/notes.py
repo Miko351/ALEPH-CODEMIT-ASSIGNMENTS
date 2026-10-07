@@ -3,7 +3,7 @@ from monitor.backend.db import connect_db
 
 def list_notes():
     with connect_db() as conn:
-        return conn.execute("SELECT id, title, updated_at FROM notes ORDER BY id DESC").fetchall()
+        return conn.execute("SELECT id, title, status, updated_at FROM notes ORDER BY id DESC").fetchall()
 
 
 def find_note(note_id):
@@ -11,16 +11,16 @@ def find_note(note_id):
         return conn.execute("SELECT * FROM notes WHERE id = %s", (note_id,)).fetchone()
 
 
-def create_note(title, body):
+def create_note(title, body, status="pending"):
     with connect_db() as conn:
-        return conn.execute("INSERT INTO notes (title, body) VALUES (%s, %s) RETURNING *", (title, body)).fetchone()
+        return conn.execute("INSERT INTO notes (title, body, status) VALUES (%s, %s, %s) RETURNING *", (title, body, status)).fetchone()
 
 
-def update_note(note_id, title, body):
+def update_note(note_id, title, body, status):
     with connect_db() as conn:
         return conn.execute(
-            "UPDATE notes SET title = %s, body = %s, updated_at = CURRENT_TIMESTAMP WHERE id = %s RETURNING *",
-            (title, body, note_id),
+            "UPDATE notes SET title = %s, body = %s, status = %s, updated_at = CURRENT_TIMESTAMP WHERE id = %s RETURNING *",
+            (title, body, status, note_id),
         ).fetchone()
 
 

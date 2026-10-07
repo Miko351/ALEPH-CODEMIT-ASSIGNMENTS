@@ -18,6 +18,8 @@ def main():
                 print("Existing posts table and sequence preserved.")
                 continue
             conn.execute((directory / "sql" / filename).read_text(encoding="utf-8"))
+            if service == "monitor/backend":
+                conn.execute((directory / "sql" / "003_note_status.sql").read_text(encoding="utf-8"))
         print(f"Applied {service}/sql/{filename}; existing records preserved.")
 
 

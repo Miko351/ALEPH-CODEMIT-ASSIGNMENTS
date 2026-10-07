@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 import os
+import secrets
 from pathlib import Path
 import socket
 import subprocess
@@ -34,7 +35,7 @@ def database():
     isolated = make_conninfo(dsn, options=f"-csearch_path={schema}")
     try:
         with psycopg.connect(isolated) as conn:
-            for path in ("general/sql/001_posts.sql", "monitor/backend/sql/002_monitor.sql"):
+            for path in ("general/sql/001_posts.sql", "monitor/backend/sql/002_monitor.sql", "monitor/backend/sql/003_note_status.sql"):
                 conn.execute((ROOT / path).read_text(encoding="utf-8"))
         yield isolated
     finally:
@@ -45,7 +46,7 @@ def database():
 
 @pytest.fixture
 def application(database):
-    app = create_app({"TESTING": True, "DATABASE_URL": database})
+    app = create_app({"TESTING": True, "DATABASE_URL": database, "SECRET_KEY": secrets.token_hex(32)})
     with app.app_context():
         create_user("tester", "테스트 운영자", generate_password_hash("temporary-test-password"))
     return app
@@ -53,7 +54,10 @@ def application(database):
 
 @pytest.fixture
 def client(application):
-    return application.test_client()
+    client = application.test_client()
+    response = client.post('/api/auth/login', json={'username': 'tester', 'password': 'temporary-test-password'})
+    assert response.status_code == 200
+    return client
 
 
 @contextmanager

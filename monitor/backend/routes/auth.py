@@ -1,7 +1,8 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, session
 from werkzeug.security import check_password_hash, generate_password_hash
 from monitor.backend.repositories.users import find_user
 from monitor.backend.rules import json_object
+from monitor.backend.authentication import current_user, require_login
 
 blueprint = Blueprint("auth", __name__, url_prefix="/api/auth")
 DUMMY_HASH = generate_password_hash("unusable-account-placeholder")
@@ -9,6 +10,7 @@ DUMMY_HASH = generate_password_hash("unusable-account-placeholder")
 
 @blueprint.post("/login")
 def login():
+    session.clear()
     data = json_object()
     username, password = data.get("username"), data.get("password")
     if not isinstance(username, str) or not username.strip() or not isinstance(password, str) or not password.strip():
@@ -17,4 +19,18 @@ def login():
     matches = check_password_hash(user["password_hash"] if user else DUMMY_HASH, password)
     if user is None or not matches:
         return jsonify(error="아이디 또는 비밀번호가 올바르지 않습니다."), 401
+    session["user_id"] = user["id"]
+    session.permanent = True
     return jsonify(user={key: user[key] for key in ("id", "username", "name")})
+
+
+@blueprint.get("/me")
+def me():
+    rejection = require_login()
+    return rejection if rejection is not None else jsonify(user=current_user())
+
+
+@blueprint.post("/logout")
+def logout():
+    session.clear()
+    return jsonify(message="로그아웃했습니다.")

@@ -4,7 +4,7 @@ import { login } from '../api/auth.js';
 import Brand from './Brand.jsx';
 import Message from './Message.jsx';
 
-export default function LoginForm({ onLogin }) {
+export default function LoginForm({ onLogin, sessionError }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -21,7 +21,7 @@ export default function LoginForm({ onLogin }) {
     <section className="login-panel"><div className="login-card"><span className="eyebrow">OPERATOR ACCESS</span><h2>운영자 로그인</h2><p className="muted">계정으로 로그인해 감시 대시보드를 열어 주세요.</p><form onSubmit={submit} noValidate>
       <label htmlFor="username">아이디</label><input id="username" name="username" autoComplete="username" value={username} onChange={e => setUsername(e.target.value)} placeholder="운영자 아이디" disabled={busy} />
       <label htmlFor="password">비밀번호</label><input id="password" name="password" type="password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} placeholder="비밀번호 입력" disabled={busy} />
-      <Message>{error}</Message><button className="primary login-submit" disabled={busy}>{busy ? '계정 확인 중…' : '대시보드 열기'}<ArrowRight size={18} /></button>
+      <Message>{error || sessionError}</Message><button className="primary login-submit" disabled={busy}>{busy ? '계정 확인 중…' : '대시보드 열기'}<ArrowRight size={18} /></button>
     </form><div className="login-hint"><span className="status-dot" /> 일반 서비스의 기록과 메모를 한곳에서</div></div><small className="login-bottom">MINI WATCH · 서비스 관찰 대시보드</small></section>
   </main>;
 }

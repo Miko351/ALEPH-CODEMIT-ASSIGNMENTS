@@ -3,12 +3,16 @@ import math
 from flask import Blueprint, jsonify
 from monitor.backend.repositories import events
 from monitor.backend.rules import json_object
+from monitor.backend.authentication import require_login
 
 blueprint = Blueprint("events", __name__, url_prefix="/api/events")
 
 
 @blueprint.get("")
 def index():
+    rejection = require_login()
+    if rejection is not None:
+        return rejection
     return jsonify(events=events.list_events())
 
 

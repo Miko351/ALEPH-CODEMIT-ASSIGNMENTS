@@ -1,8 +1,10 @@
 from flask import Blueprint, jsonify
 from monitor.backend.repositories import notes
 from monitor.backend.rules import json_object, validate_note
+from monitor.backend.authentication import require_login
 
 blueprint = Blueprint("notes", __name__, url_prefix="/api/notes")
+blueprint.before_request(require_login)
 
 
 def missing():
@@ -30,9 +32,10 @@ def create():
 
 @blueprint.put("/<int:note_id>")
 def edit(note_id):
-    if notes.find_note(note_id) is None:
+    existing = notes.find_note(note_id)
+    if existing is None:
         return missing()
-    values, errors = validate_note(json_object())
+    values, errors = validate_note(json_object(), default_status=existing["status"])
     if errors:
         return jsonify(error="제목과 내용을 확인해 주세요.", fields=errors), 400
     note = notes.update_note(note_id, **values)

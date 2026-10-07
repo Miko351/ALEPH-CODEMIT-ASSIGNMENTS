@@ -19,6 +19,8 @@ def login(page):
 @pytest.mark.parametrize('width,height', [(1440, 1080), (390, 844)])
 def test_complete_dashboard_flow(frontend, width, height):
     url, monitor_url, general_url = frontend
+    api = requests.Session()
+    assert api.post(monitor_url + '/api/auth/login', json={'username': 'tester', 'password': 'temporary-test-password'}, timeout=5).status_code == 200
     result = requests.post(general_url + '/board/new', data={'title': '브라우저 게시글', 'body': '관찰할 내용'}, allow_redirects=False, timeout=5)
     assert result.status_code == 303
     requests.get(general_url + result.headers['Location'], timeout=5)
@@ -29,6 +31,8 @@ def test_complete_dashboard_flow(frontend, width, height):
         page_errors = []
         page.on('pageerror', lambda error: page_errors.append(str(error)))
         page.goto(url)
+        assert page.request.get(url + '/api/notes').status == 401
+        assert page.request.get(url + '/api/events').status == 401
         page.get_by_label('아이디', exact=True).fill('tester')
         page.get_by_label('비밀번호', exact=True).fill('incorrect')
         page.get_by_role('button', name='대시보드 열기').click()
@@ -56,28 +60,36 @@ def test_complete_dashboard_flow(frontend, width, height):
         page.get_by_role('button', name='메모 저장').click()
         expect(page.get_by_role('alert')).to_contain_text('제목과 내용을 확인')
         expect(page.get_by_label('제목', exact=True)).to_have_value('  관찰 한 개  ')
-        assert requests.get(monitor_url + '/api/notes', timeout=5).json()['notes'] == []
+        assert api.get(monitor_url + '/api/notes', timeout=5).json()['notes'] == []
         page.get_by_label('내용', exact=True).fill('  404 응답을 확인했습니다.  ')
+        page.get_by_label('처리 상태', exact=True).select_option('in_progress')
         page.get_by_role('button', name='메모 저장').click()
         expect(page.get_by_role('heading', name='관찰 한 개', exact=True)).to_be_visible()
         expect(page.locator('.note-body')).to_have_text('404 응답을 확인했습니다.')
+        expect(page.locator('.note-detail .note-status')).to_have_text('확인 중')
+        expect(page.locator('.note-list .note-status')).to_have_text('확인 중')
         # Editing starts with persisted values, invalid PUT preserves DB.
         page.get_by_role('button', name='수정', exact=True).click()
         expect(page.get_by_label('제목', exact=True)).to_have_value('관찰 한 개')
         expect(page.get_by_label('내용', exact=True)).to_have_value('404 응답을 확인했습니다.')
+        expect(page.get_by_label('처리 상태', exact=True)).to_have_value('in_progress')
         page.get_by_label('내용', exact=True).fill(' \n ')
+        page.get_by_label('처리 상태', exact=True).select_option('completed')
         page.get_by_role('button', name='메모 저장').click()
         expect(page.get_by_role('alert')).to_contain_text('제목과 내용을 확인')
-        note_id = requests.get(monitor_url + '/api/notes', timeout=5).json()['notes'][0]['id']
-        assert requests.get(monitor_url + f'/api/notes/{note_id}', timeout=5).json()['note']['body'] == '404 응답을 확인했습니다.'
+        note_id = api.get(monitor_url + '/api/notes', timeout=5).json()['notes'][0]['id']
+        preserved = api.get(monitor_url + f'/api/notes/{note_id}', timeout=5).json()['note']
+        assert preserved['body'] == '404 응답을 확인했습니다.' and preserved['status'] == 'in_progress'
         page.get_by_role('button', name='취소', exact=True).click()
         expect(page.locator('.note-body')).to_have_text('404 응답을 확인했습니다.')
         page.get_by_role('button', name='수정', exact=True).click()
         page.get_by_label('제목', exact=True).fill('수정된 관찰')
         page.get_by_label('내용', exact=True).fill('수정 내용이 DB에 유지됩니다.')
+        page.get_by_label('처리 상태', exact=True).select_option('completed')
         page.get_by_role('button', name='메모 저장').click()
         expect(page.get_by_role('heading', name='수정된 관찰', exact=True)).to_be_visible()
         expect(page.locator('.note-list')).to_contain_text('수정된 관찰')
+        expect(page.locator('.note-detail .note-status')).to_have_text('완료')
         # A second note: cancel must keep it, confirm must delete only it.
         page.get_by_role('button', name='새 메모').click()
         page.get_by_label('제목', exact=True).fill('삭제 시험 메모')
@@ -88,17 +100,18 @@ def test_complete_dashboard_flow(frontend, width, height):
         expect(page.get_by_role('heading', name='이 메모를 삭제할까요?')).to_be_visible()
         page.get_by_role('button', name='취소', exact=True).click()
         expect(page.get_by_role('heading', name='삭제 시험 메모', exact=True)).to_be_visible()
-        assert len(requests.get(monitor_url + '/api/notes', timeout=5).json()['notes']) == 2
+        assert len(api.get(monitor_url + '/api/notes', timeout=5).json()['notes']) == 2
         page.get_by_role('button', name='삭제', exact=True).click()
         page.get_by_role('button', name='삭제 확정').click()
         expect(page.get_by_role('status')).to_contain_text('삭제했습니다')
         expect(page.locator('.note-list')).not_to_contain_text('삭제 시험 메모')
-        # Reload clears user state while notes/events remain in PostgreSQL.
+        # The signed HttpOnly cookie restores login and persisted note status.
         page.reload()
-        expect(page.get_by_role('heading', name='운영자 로그인')).to_be_visible()
-        login(page)
+        expect(page.get_by_role('heading', name='오늘의 서비스 관찰')).to_be_visible()
         page.locator('.note-list').get_by_role('button', name='수정된 관찰', exact=False).click()
         expect(page.locator('.note-body')).to_have_text('수정 내용이 DB에 유지됩니다.')
+        expect(page.locator('.note-detail .note-status')).to_have_text('완료')
+        assert page.request.get(url + '/api/auth/me').status == 200
         expect(page.locator('.note-list')).not_to_contain_text('삭제 시험 메모')
         # React displays backend/network failures without false success.
         page.route('**/api/notes', lambda route: route.fulfill(status=503, content_type='application/json', body='{"error":"메모 조회 실패 테스트"}'))
@@ -119,5 +132,15 @@ def test_complete_dashboard_flow(frontend, width, height):
         page.screenshot(path=str(cache / f'dashboard-{width}.png'), full_page=True)
         page.get_by_role('button', name='로그아웃').click()
         expect(page.get_by_role('heading', name='운영자 로그인')).to_be_visible()
+        assert page.request.get(url + '/api/notes').status == 401
+        assert page.request.get(url + '/api/events').status == 401
+        page.reload()
+        expect(page.get_by_role('heading', name='운영자 로그인')).to_be_visible()
         page.screenshot(path=str(cache / f'login-{width}.png'), full_page=True)
+        login(page)
+        page.context.clear_cookies()
+        page.get_by_role('button', name='목록 새로고침').click()
+        expect(page.get_by_role('heading', name='운영자 로그인')).to_be_visible()
+        expect(page.get_by_role('alert')).to_contain_text('로그인이 만료되었습니다')
         browser.close()
+        api.close()
