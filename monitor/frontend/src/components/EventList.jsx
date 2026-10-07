@@ -1,0 +1,11 @@
+import { Search, X } from 'lucide-react';
+import Message from './Message.jsx';
+
+export default function EventList({ events, totalCount, query, status, onQuery, onStatus, onReset, loading, error }) {
+  return <section className="panel events-panel" aria-labelledby="events-heading"><div className="panel-heading"><div><span className="eyebrow">LIVE REQUESTS</span><h2 id="events-heading">요청 기록 <span className="count">{events.length}</span></h2></div><span className="quiet-tag">일반 서비스</span></div>
+    <div className="event-filters"><label className="search-input"><Search size={17} /><input aria-label="요청 경로 검색" value={query} onChange={e => onQuery(e.target.value)} placeholder="요청 경로 검색" /></label><select aria-label="응답 상태 필터" value={status} onChange={e => onStatus(e.target.value)}><option value="all">모든 상태</option><option value="success">정상 · 200–399</option><option value="error">오류 · 400 이상</option><option value="404">404 · 없는 주소</option><option value="500">500 이상 · 서버 오류</option></select>{(query || status !== 'all') && <button className="icon-button" aria-label="필터 초기화" onClick={onReset}><X size={18} /></button>}</div>
+    <Message>{error}</Message><div className="table-scroll"><table><thead><tr><th>요청 시각</th><th>메서드</th><th>경로</th><th>상태</th><th>소요 시간</th></tr></thead><tbody>{events.map(event => <tr key={event.id}><td className="time-cell">{new Date(event.occurred_at).toLocaleTimeString('ko-KR', { hour12: false })}<small>{new Date(event.occurred_at).toLocaleDateString('ko-KR')}</small></td><td><span className={`method ${event.method.toLowerCase()}`}>{event.method}</span></td><td><code className="event-path">{event.path}</code></td><td><span className={`status-badge ${event.status_code >= 400 ? 'bad' : 'good'}`}>{event.status_code}</span></td><td className="duration">{Number(event.duration_ms).toFixed(1)} ms</td></tr>)}</tbody></table></div>
+    {!events.length && !error && <div className="empty-state">{loading ? '요청 기록을 불러오는 중입니다…' : totalCount ? '검색 조건에 맞는 요청 기록이 없습니다.' : '수집된 요청 기록이 없습니다.'}<small>{!totalCount && !loading && '일반 게시판에 접속한 뒤 목록을 새로고침하세요.'}</small></div>}
+    <div className="table-footer">최근 요청부터 표시합니다.<span>조회한 전체 기록 {totalCount}건</span></div>
+  </section>;
+}

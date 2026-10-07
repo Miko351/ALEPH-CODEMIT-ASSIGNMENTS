@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block content %}
+<a class="back-link" href="{{ url_for('posts.index') }}">← 목록으로</a>
+<article class="content-card"><div class="article-heading"><span class="eyebrow">STORY NO. {{ post.id }}</span><h1>{{ post.title }}</h1><span class="meta">게시글 번호 {{ post.id }}</span></div><div class="post-body">{{ post.body }}</div><div class="article-actions"><a class="button button-outline" href="{{ url_for('posts.edit', post_id=post.id) }}">수정하기</a><a class="button button-danger-outline" href="{{ url_for('posts.delete', post_id=post.id) }}">삭제하기</a></div></article>
+{% endblock %}
