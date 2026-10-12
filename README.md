@@ -215,7 +215,7 @@ API 테스트는 기존 CRUD·오류·기록 수집·데이터 유지 외에 처
 
 ## Git과 제출 ZIP
 
-소스는 이 폴더의 로컬 Git 저장소에 커밋합니다. 실제 환경 파일·DB·로그·캐시·가상환경·node_modules·빌드 결과를 제외합니다. GitHub 업로드는 수행하지 않습니다.
+기존 로컬 Git 이력을 유지하며 공통 과제 저장소의 [monitor-dashboard 브랜치](https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/tree/monitor-dashboard)에 소스를 보관합니다. 이 폴더의 `origin`은 해당 저장소이며 작업 브랜치는 `monitor-dashboard`입니다. 실제 환경 파일·DB·로그·캐시·가상환경·node_modules·빌드 결과는 제외합니다.
 
 ```cmd
 cd /d D:\ALEPH_Codemit\monitor-dashboard
