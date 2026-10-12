@@ -145,7 +145,7 @@ $env:PLAYWRIGHT_BROWSERS_PATH = 'D:\ALEPH_Codemit\posts-crud\.cache\ms-playwrigh
 
 ## Git과 ZIP
 
-이 프로젝트만 별도 Git 저장소로 관리합니다. 작업 폴더에서 `git log -1 --oneline`, `git status --short`로 커밋을 확인할 수 있습니다. GitHub 원격 저장소 주소는 제공되지 않아 원격 업로드는 수행하지 않았습니다.
+기존 로컬 Git 이력을 유지하며 공통 과제 저장소의 [posts-crud 브랜치](https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/tree/posts-crud)에 소스를 보관합니다. 이 폴더의 `origin`은 해당 저장소이며 작업 브랜치는 `posts-crud`입니다. 작업 폴더에서 `git log -1 --oneline`, `git status --short`로 커밋을 확인할 수 있습니다. 실제 환경 설정, DB와 설치 캐시는 업로드하지 않습니다.
 
 ZIP에는 `posts-crud.bundle`도 넣어 **실제 Git 커밋 이력**을 전달합니다. 압축을 푼 폴더에서 `git clone posts-crud.bundle recovered-posts-crud`를 실행하면 별도 폴더로 저장소를 복원할 수 있습니다. 수정한 내용을 새로 커밋한 뒤 제출할 때는 `git bundle create posts-crud.bundle --all`로 bundle을 갱신하고 ZIP을 다시 생성하세요.
 
