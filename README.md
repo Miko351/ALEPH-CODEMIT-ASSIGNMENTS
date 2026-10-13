@@ -160,3 +160,81 @@ Docker 적용 커밋과 개선 PR은 아래 Git 기록 절에 식별자·변경 
 ZIP은 scripts/package.py로 생성하며 소스·Compose·Dockerfile·.dockerignore·SQL·설정 예시·requirements·package-lock·README·테스트를 포함한다. .env·DB 데이터·가상환경·node_modules·.next·캐시·.git는 제외한다.
 
 참고: [Docker Compose 네트워크](https://docs.docker.com/compose/how-tos/networking/), [건강 상태와 시작 순서](https://docs.docker.com/compose/how-tos/startup-order/), [Docker volumes](https://docs.docker.com/reference/compose-file/volumes/), [Next.js Docker 배포](https://nextjs.org/docs/app/getting-started/deploying).
+
+## Git 적용 커밋·개선 PR 기록
+
+- Docker 기본 구현: `ecac6097db9db4b6377dc7bf875607320086f69d` — 두 Compose, Dockerfile·Nginx·SQL·DB 볼륨·로그인 기록·감시 화면과 실행 안내를 추가.
+- 개선 작업 브랜치: `feature/compose-web-health`. 로컬 수정·배포 계약 테스트 후 커밋·push.
+- 개선 커밋: `46eeb82bf7f8cfbd3f6fbc785448ae621156a409` — Next.js HTTP healthcheck와 gateway 준비 대기를 추가. 변경 파일: compose-monitor.yaml, tests/test_deployment.py, README.md.
+- PR: [https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/7](https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/7). base=`mini-watch-compose`, 상태 `MERGED`, 병합 시각 `2026-10-13T03:56:45Z`.
+- merge commit: `49503741dcc4b3825e933cf52be392b2cc639cda`. 부모 2개인 merge commit으로 병합했다. 로컬 mini-watch-compose에서 pull --ff-only 후 완료한 개선 브랜치를 로컬·원격에서 삭제.
+
+실제 PR diff를 읽어 확인한 검토 내용은 PR 본문에도 남겼다. 아래는 해당 본문이다. 외부 리뷰어의 승인이라고 주장하지 않고 작성자가 변경 내용을 점검한 기록이다.
+
+```text
+감시 gateway가 Next.js 프로세스 생성 직후 시작하면 HTTP 준비 전에 일시적인 502가 발생할 수 있습니다. monitor-web에 Node.js fetch 기반 HTTP healthcheck를 추가하고 monitor-gateway의 의존 조건을 service_healthy로 변경했습니다.
+
+직접 diff 검토: 상태 확인은 monitor-web 컨테이너 자신의 127.0.0.1:3000을 대상으로 하며 컨테이너 간 주소에는 기존 서비스 이름을 유지합니다. 추가 도구 설치 없이 기본 Node.js로 검사합니다. DB·외부 공유 망·공개 포트·볼륨 설정은 변경하지 않습니다. README 설명과 배포 계약 테스트를 함께 갱신했습니다.
+
+검증: tests/test_deployment.py 2 passed. 기존 앱의 Next.js lint/build 및 PostgreSQL 앱 테스트 3개 통과. 이 PC에는 Docker가 없어 사용자가 설치를 맡았으며 실제 Docker build/up과 컨테이너 HTTP healthcheck는 아직 실행하지 않았습니다.
+```
+
+ZIP에서도 개선 내용을 확인하도록 실제 개선 커밋의 diff를 아래에 포함한다. 출력 끝 공백만 제거했다.
+
+```diff
+diff --git a/README.md b/README.md
+index 7300873..97e81c4 100644
+--- a/README.md
++++ b/README.md
+@@ -96,7 +96,9 @@ docker compose -f compose-general.yaml logs --tail=100 general-api
+ docker compose -f compose-monitor.yaml logs --tail=100 monitor-api
+ ```
+
+-config는 YAML·변수·서비스 참조의 유효성, ps는 컨테이너 실행과 DB/API 건강 상태, inspect는 공유 망에 두 API만 참여했는지, getent는 감시 API 이름이 IP로 해석되는지 확인한다. 이름 조회 성공은 HTTP 처리·DB 인증·SQL 성공을 보장하지 않는다. `/api/auth/me`의 200은 감시 HTTP·DB 준비를 확인하며, 실제 로그인 실험 후 기록 불러오기는 전송·수신·DB 저장·조회·화면 표시까지 확인한다. 로그에서 DB 접속 오류나 전송 실패를 확인한다.
++config는 YAML·변수·서비스 참조의 유효성, ps는 컨테이너 실행과 DB/API/Next.js 건강 상태, inspect는 공유 망에 두 API만 참여했는지, getent는 감시 API 이름이 IP로 해석되는지 확인한다. 이름 조회 성공은 HTTP 처리·DB 인증·SQL 성공을 보장하지 않는다. `/api/auth/me`의 200은 감시 HTTP·DB 준비를 확인하며, 실제 로그인 실험 후 기록 불러오기는 전송·수신·DB 저장·조회·화면 표시까지 확인한다. 로그에서 DB 접속 오류나 전송 실패를 확인한다.
++
++Docker 설정 개선으로 monitor-web에 Node.js fetch 기반 HTTP healthcheck를 추가하고 monitor-gateway가 service_healthy를 기다리도록 변경했다. 단순히 프로세스가 시작된 시점에 gateway를 여는 대신 Next.js가 실제 200 응답을 반환한 뒤 시작한다. 이 개선의 diff와 PR 이력은 아래 Git 기록에 남긴다.
+
+ ## 심화: 공유 망 분리와 복구
+
+diff --git a/compose-monitor.yaml b/compose-monitor.yaml
+index 9340e1d..abe7f9c 100644
+--- a/compose-monitor.yaml
++++ b/compose-monitor.yaml
+@@ -42,6 +42,12 @@ services:
+     environment:
+       NODE_ENV: production
+       NEXT_TELEMETRY_DISABLED: "1"
++    healthcheck:
++      test: [CMD, node, -e, "fetch('http://127.0.0.1:3000').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
++      interval: 5s
++      timeout: 3s
++      retries: 20
++      start_period: 10s
+     networks: [monitor-web]
+     restart: unless-stopped
+   monitor-gateway:
+@@ -53,7 +59,7 @@ services:
+       monitor-api:
+         condition: service_healthy
+       monitor-web:
+-        condition: service_started
++        condition: service_healthy
+     networks: [monitor-web]
+     restart: unless-stopped
+ volumes:
+diff --git a/tests/test_deployment.py b/tests/test_deployment.py
+index 45b1a49..592c668 100644
+--- a/tests/test_deployment.py
++++ b/tests/test_deployment.py
+@@ -45,6 +45,9 @@ def test_compose_isolation_and_persistence():
+         assert (ROOT / sql_mount.split(':')[0]).is_file()
+     general = yaml.safe_load((ROOT / 'compose-general.yaml').read_text())
+     assert general['services']['general-api']['environment']['MONITOR_URL'] == 'http://monitor-api:5000/api/events'
++    monitor = yaml.safe_load((ROOT / 'compose-monitor.yaml').read_text())
++    assert monitor['services']['monitor-gateway']['depends_on']['monitor-web']['condition'] == 'service_healthy'
++    assert monitor['services']['monitor-web']['healthcheck']['test'][:2] == ['CMD', 'node']
+
+
+ def test_build_commands_and_gateway_routes():
+```
