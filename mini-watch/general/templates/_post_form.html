@@ -1,0 +1,6 @@
+{% if errors %}<div class="error-summary" role="alert">입력한 내용을 확인해 주세요. 제목과 내용은 모두 필요합니다.</div>{% endif %}
+<form method="post" action="{{ form_action }}" novalidate>
+  <div class="field"><label for="title">제목 <span>*</span></label><input id="title" name="title" type="text" value="{{ values.title }}" placeholder="이야기에 제목을 붙여주세요" required {% if errors.title %}aria-invalid="true" aria-describedby="title-error" autofocus{% endif %}>{% if errors.title %}<p id="title-error" class="field-error">{{ errors.title }}</p>{% endif %}</div>
+  <div class="field"><label for="body">내용 <span>*</span></label><textarea id="body" name="body" rows="10" placeholder="어떤 이야기를 나누고 싶나요?" required {% if errors.body %}aria-invalid="true" aria-describedby="body-error"{% if not errors.title %} autofocus{% endif %}{% endif %}>{{ values.body }}</textarea>{% if errors.body %}<p id="body-error" class="field-error">{{ errors.body }}</p>{% endif %}<p class="field-hint">제목과 내용에 공백만 입력할 수 없습니다.</p></div>
+  <div class="form-actions"><a class="button button-outline" href="{{ cancel_url }}">취소</a><button class="button" type="submit">{{ submit_label }} <span aria-hidden="true">↗</span></button></div>
+</form>
