@@ -128,6 +128,12 @@ test("빈 목록과 새로고침 초기화, 반응형 화면", async ({ page }, 
   await expect(
     page.getByRole("heading", { name: "등록된 메모가 없습니다." }),
   ).toBeVisible();
+  await expect(
+    page.getByText(
+      "작성 칸에서 첫 메모를 남겨 보세요. 새로고침하면 초기 메모로 돌아옵니다.",
+      { exact: true },
+    ),
+  ).toBeVisible();
   await page.reload();
   await expect(page.locator("article[data-note-id]")).toHaveCount(2);
   expect(
