@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}사이 게시판{% endblock %} · SAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="{{ url_for('posts.index') }}"><span class="brand-icon">s.</span>사이<span class="brand-caption">생각이 머무는 곳</span></a>
+      <nav aria-label="메인 메뉴"><a href="{{ url_for('posts.index') }}">게시글 목록</a>{% if session.get('user_id') %}<span>{{ session.get('name') }}님</span><a class="button button-small" href="{{ url_for('posts.new') }}">+ 새 글 작성</a>{% else %}<a href="{{ url_for('auth.login_page') }}">로그인</a>{% endif %}</nav>
+    </header>
+    <main class="page-shell">{% block content %}{% endblock %}</main>
+    <footer class="site-footer"><span>SAI BOARD</span><span>일상의 생각을 나누는 작은 공간.</span></footer>
+  </body>
+</html>

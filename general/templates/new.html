@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}새 글 작성{% endblock %}
+{% block content %}
+<a class="back-link" href="{{ url_for('posts.index') }}">← 목록으로</a><section class="content-card form-card"><p class="eyebrow">YOUR NEW STORY</p><h1>새로운 이야기를 남겨보세요.</h1><p class="lead">당신의 생각이 누군가에게 작은 영감이 될 수 있어요.</p>
+{% set form_action = url_for('posts.new') %}{% set cancel_url = url_for('posts.index') %}{% set submit_label = '게시글 저장' %}{% include '_post_form.html' %}</section>
+{% endblock %}

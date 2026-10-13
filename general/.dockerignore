@@ -1,0 +1,17 @@
+.git
+.env
+.env.*
+!.env.example
+.venv
+venv
+node_modules
+.next
+.cache
+__pycache__
+.pytest_cache
+instance
+*.log
+*.pyc
+tests
+test-results
+playwright-report

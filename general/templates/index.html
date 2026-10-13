@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}게시글 목록{% endblock %}
+{% block content %}
+<section class="page-heading"><div><p class="eyebrow">A SPACE BETWEEN US</p><h1>생각과 이야기, 그 사이.</h1><p class="lead">가벼운 메모부터 오래 담아둔 이야기까지, 자유롭게 나눠보세요.</p></div><span class="heading-mark" aria-hidden="true">s.</span></section>
+<section class="board-card" aria-labelledby="board-heading">
+  <div class="card-heading"><h2 id="board-heading">모든 게시글 <span class="count">{{ posts|length }}</span></h2><span class="sort-label">번호순 · 오름차순</span></div>
+  {% if posts %}
+  <table class="post-table"><thead><tr><th scope="col" class="number-column">번호</th><th scope="col">제목</th><th scope="col" class="arrow-column"><span class="sr-only">상세 이동</span></th></tr></thead><tbody>
+  {% for post in posts %}<tr><td class="post-number">{{ post.id }}</td><td><a class="post-link" href="{{ url_for('posts.detail', post_id=post.id) }}">{{ post.title }}</a></td><td class="row-arrow" aria-hidden="true">↗</td></tr>{% endfor %}
+  </tbody></table>
+  {% else %}<div class="empty-state"><span class="empty-icon" aria-hidden="true">✎</span><h3>등록된 게시글이 없습니다.</h3><p>첫 번째 이야기를 남겨보세요.</p><a class="button" href="{{ url_for('posts.new') }}">새 글 작성 <span aria-hidden="true">↗</span></a></div>{% endif %}
+  <div class="card-footer"><span>당신의 이야기가 이 공간을 채웁니다.</span><a href="{{ url_for('posts.new') }}">새 글 작성 →</a></div>
+</section>
+{% endblock %}

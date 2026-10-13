@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}게시글 삭제 확인{% endblock %}
+{% block content %}
+<a class="back-link" href="{{ url_for('posts.detail', post_id=post.id) }}">← 상세로 돌아가기</a><section class="content-card confirmation-card"><span class="warning-icon" aria-hidden="true">!</span><p class="eyebrow">DELETE STORY NO. {{ post.id }}</p><h1>이 이야기를 삭제할까요?</h1><p class="lead">삭제한 게시글은 되돌릴 수 없습니다.<br>삭제 확인을 누르면 게시글이 목록에서 사라집니다.</p><div class="delete-preview"><span>삭제할 게시글</span><strong>{{ post.title }}</strong></div><form method="post" action="{{ url_for('posts.delete', post_id=post.id) }}"><div class="form-actions"><a class="button button-outline" href="{{ url_for('posts.detail', post_id=post.id) }}">취소</a><button class="button button-danger" type="submit">삭제 확인</button></div></form></section>
+{% endblock %}
