@@ -96,7 +96,9 @@ docker compose -f compose-general.yaml logs --tail=100 general-api
 docker compose -f compose-monitor.yaml logs --tail=100 monitor-api
 ```
 
-config는 YAML·변수·서비스 참조의 유효성, ps는 컨테이너 실행과 DB/API 건강 상태, inspect는 공유 망에 두 API만 참여했는지, getent는 감시 API 이름이 IP로 해석되는지 확인한다. 이름 조회 성공은 HTTP 처리·DB 인증·SQL 성공을 보장하지 않는다. `/api/auth/me`의 200은 감시 HTTP·DB 준비를 확인하며, 실제 로그인 실험 후 기록 불러오기는 전송·수신·DB 저장·조회·화면 표시까지 확인한다. 로그에서 DB 접속 오류나 전송 실패를 확인한다.
+config는 YAML·변수·서비스 참조의 유효성, ps는 컨테이너 실행과 DB/API/Next.js 건강 상태, inspect는 공유 망에 두 API만 참여했는지, getent는 감시 API 이름이 IP로 해석되는지 확인한다. 이름 조회 성공은 HTTP 처리·DB 인증·SQL 성공을 보장하지 않는다. `/api/auth/me`의 200은 감시 HTTP·DB 준비를 확인하며, 실제 로그인 실험 후 기록 불러오기는 전송·수신·DB 저장·조회·화면 표시까지 확인한다. 로그에서 DB 접속 오류나 전송 실패를 확인한다.
+
+Docker 설정 개선으로 monitor-web에 Node.js fetch 기반 HTTP healthcheck를 추가하고 monitor-gateway가 service_healthy를 기다리도록 변경했다. 단순히 프로세스가 시작된 시점에 gateway를 여는 대신 Next.js가 실제 200 응답을 반환한 뒤 시작한다. 이 개선의 diff와 PR 이력은 아래 Git 기록에 남긴다.
 
 ## 심화: 공유 망 분리와 복구
 

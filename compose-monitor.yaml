@@ -42,6 +42,12 @@ services:
     environment:
       NODE_ENV: production
       NEXT_TELEMETRY_DISABLED: "1"
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3000').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
     networks: [monitor-web]
     restart: unless-stopped
   monitor-gateway:
@@ -53,7 +59,7 @@ services:
       monitor-api:
         condition: service_healthy
       monitor-web:
-        condition: service_started
+        condition: service_healthy
     networks: [monitor-web]
     restart: unless-stopped
 volumes:

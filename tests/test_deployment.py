@@ -45,6 +45,9 @@ def test_compose_isolation_and_persistence():
         assert (ROOT / sql_mount.split(':')[0]).is_file()
     general = yaml.safe_load((ROOT / 'compose-general.yaml').read_text())
     assert general['services']['general-api']['environment']['MONITOR_URL'] == 'http://monitor-api:5000/api/events'
+    monitor = yaml.safe_load((ROOT / 'compose-monitor.yaml').read_text())
+    assert monitor['services']['monitor-gateway']['depends_on']['monitor-web']['condition'] == 'service_healthy'
+    assert monitor['services']['monitor-web']['healthcheck']['test'][:2] == ['CMD', 'node']
 
 
 def test_build_commands_and_gateway_routes():
