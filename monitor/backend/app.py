@@ -7,31 +7,34 @@ import sys
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from dotenv import dotenv_values
+from dotenv import load_dotenv
 from flask import Flask, jsonify
 import psycopg
 from werkzeug.exceptions import HTTPException
 from monitor.backend.routes.auth import blueprint as auth_blueprint
 from monitor.backend.routes.events import blueprint as events_blueprint
 from monitor.backend.routes.notes import blueprint as notes_blueprint
+from monitor.backend.observability import configure_errors
 
 
 def create_app(config=None):
-    settings = dotenv_values(Path(__file__).with_name(".env"))
+    load_dotenv(Path(__file__).with_name(".env"), override=False, interpolate=False)
     app = Flask(__name__)
     app.config.from_mapping(
-        DATABASE_URL=os.getenv("DATABASE_URL") or settings.get("DATABASE_URL"),
+        DATABASE_URL=os.getenv("DATABASE_URL"),
         DB_HOST=os.getenv("DB_HOST", "monitor-db"),
         DB_PORT=os.getenv("DB_PORT", "5432"),
         DB_NAME=os.getenv("DB_NAME", "monitor"),
         DB_USER=os.getenv("DB_USER", "monitor"),
         DB_PASSWORD=os.getenv("DB_PASSWORD"),
-        SECRET_KEY=os.getenv("SECRET_KEY") or settings.get("SECRET_KEY"),
+        DB_SSLMODE=os.getenv("DB_SSLMODE", "prefer"),
+        EVENT_TOKEN=os.getenv("EVENT_TOKEN", ""),
+        SECRET_KEY=os.getenv("SECRET_KEY"),
         SESSION_COOKIE_NAME="mini_watch_session",
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
         SESSION_REFRESH_EACH_REQUEST=False,
-        SESSION_COOKIE_SECURE=False,  # Local HTTP; enable this when serving HTTPS.
+        SESSION_COOKIE_SECURE=os.getenv("SESSION_COOKIE_SECURE", "false").lower() == "true",
         PERMANENT_SESSION_LIFETIME=timedelta(hours=8),
         MAX_CONTENT_LENGTH=1024 * 1024,
     )
@@ -39,9 +42,16 @@ def create_app(config=None):
         app.config.update(config)
     secret = app.config.get("SECRET_KEY")
     if not isinstance(secret, str) or len(secret) < 32 or secret.startswith("CHANGE_ME"):
-        raise RuntimeError("먼저 scripts/configure_session.py를 실행해 SECRET_KEY를 준비하세요.")
+        raise RuntimeError("SECRET_KEY를 32자 이상으로 설정하세요.")
+    if len(app.config["EVENT_TOKEN"]) < 32 or app.config["EVENT_TOKEN"].startswith("CHANGE_ME"):
+        raise RuntimeError("EVENT_TOKEN을 32자 이상의 별도 값으로 설정하세요.")
+    configure_errors("mini-monitor")
     for blueprint in (auth_blueprint, events_blueprint, notes_blueprint):
         app.register_blueprint(blueprint)
+
+    @app.get("/health")
+    def health():
+        return jsonify(status="ok", service="monitor")
 
     @app.errorhandler(HTTPException)
     def http_error(error):
@@ -61,6 +71,7 @@ def create_app(config=None):
     return app
 
 
+app = create_app()
+
 if __name__ == "__main__":
-    settings = dotenv_values(Path(__file__).with_name(".env"))
-    create_app().run(host=os.getenv("HOST", "0.0.0.0"), port=int(os.getenv("PORT", "5000")), debug=False)
+    app.run(host=os.getenv("HOST", "0.0.0.0"), port=int(os.getenv("PORT", "5000")), debug=False)

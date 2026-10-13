@@ -1,6 +1,7 @@
 from datetime import datetime
 import math
-from flask import Blueprint, jsonify
+import hmac
+from flask import Blueprint, jsonify, current_app, request
 from monitor.backend.repositories import events
 from monitor.backend.rules import json_object
 from monitor.backend.authentication import require_login
@@ -18,6 +19,9 @@ def index():
 
 @blueprint.post("")
 def collect():
+    received = request.headers.get("X-Event-Token", "")
+    if not hmac.compare_digest(received.encode(), current_app.config["EVENT_TOKEN"].encode()):
+        return jsonify(error="기록 전송 권한이 없습니다."), 401
     data = json_object()
     method, path, status, duration = (data.get(key) for key in ("method", "path", "status_code", "duration_ms"))
     event_kind = data.get("event_kind", "request")

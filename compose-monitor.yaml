@@ -24,14 +24,20 @@ services:
       DB_NAME: monitor
       DB_USER: monitor
       DB_PASSWORD: ${MONITOR_DB_PASSWORD:-monitor-practice-db}
+      DB_SSLMODE: disable
       SECRET_KEY: ${MONITOR_SECRET_KEY:-monitor-classroom-session-key-2026-only}
+      SESSION_COOKIE_SECURE: "false"
+      EVENT_TOKEN: ${EVENT_TOKEN:?Generate the shared EVENT_TOKEN in root .env}
+      SENTRY_DSN: ""
+      SENTRY_ENVIRONMENT: mini-monitor
+      APP_VERSION: day2-v1
       HOST: 0.0.0.0
       PORT: "5000"
     depends_on:
       monitor-db:
         condition: service_healthy
     healthcheck:
-      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/api/auth/me', timeout=2)"]
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=2)"]
       interval: 5s
       timeout: 3s
       retries: 20
@@ -42,6 +48,8 @@ services:
     environment:
       NODE_ENV: production
       NEXT_TELEMETRY_DISABLED: "1"
+      MONITOR_API_URL: http://monitor-api:5000
+      PORT: "3000"
     healthcheck:
       test: [CMD, node, -e, "fetch('http://127.0.0.1:3000').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 5s

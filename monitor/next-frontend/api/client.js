@@ -1,10 +1,15 @@
+let csrfToken = "";
 export async function request(path, options = {}) {
   let response;
   try {
     response = await fetch(`/api${path}`, {
       ...options,
       credentials: "same-origin",
-      headers: { "Content-Type": "application/json", ...options.headers },
+      headers: {
+        "Content-Type": "application/json",
+        ...(csrfToken ? { "X-CSRF-Token": csrfToken } : {}),
+        ...options.headers,
+      },
       signal: AbortSignal.timeout(10000),
     });
   } catch {
@@ -13,6 +18,7 @@ export async function request(path, options = {}) {
     );
   }
   const data = await response.json().catch(() => null);
+  if (data?.csrf_token) csrfToken = data.csrf_token;
   if (!response.ok) {
     const error = new Error(data?.error || "API 요청에 실패했습니다.");
     error.status = response.status;

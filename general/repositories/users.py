@@ -17,3 +17,10 @@ def create_user(username, name, password_hash):
             "ON CONFLICT (username) DO NOTHING RETURNING id, username",
             (username, name, password_hash),
         ).fetchone()
+
+
+def find_user_by_id(user_id):
+    with connect_db() as conn, conn.cursor(row_factory=dict_row) as cursor:
+        return cursor.execute(
+            "SELECT id, username, name FROM users WHERE id = %s", (user_id,),
+        ).fetchone()

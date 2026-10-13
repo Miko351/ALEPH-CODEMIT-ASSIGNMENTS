@@ -40,7 +40,7 @@ def register_request_logging(app) -> None:
         monitor_url = app.config.get("MONITOR_URL") if request.path != "/health" else None
         if monitor_url:
             try:
-                result = requests.post(monitor_url, json=event, timeout=0.5)
+                result = requests.post(monitor_url, json=event, headers={"X-Event-Token": app.config["EVENT_TOKEN"]}, timeout=3)
                 result.raise_for_status()
             except requests.RequestException:
                 app.logger.warning("감시 서버로 요청 기록을 보내지 못했습니다.")
