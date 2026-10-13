@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: general
       POSTGRES_USER: general
-      POSTGRES_PASSWORD: ${GENERAL_DB_PASSWORD:-general-practice-db}
+      POSTGRES_PASSWORD: ${GENERAL_DB_PASSWORD:?Generate local DB password in root .env}
     volumes:
       - general-data:/var/lib/postgresql/data
       - ./general/sql/docker-init.sql:/docker-entrypoint-initdb.d/001-init.sql:ro
@@ -23,9 +23,9 @@ services:
       DB_PORT: "5432"
       DB_NAME: general
       DB_USER: general
-      DB_PASSWORD: ${GENERAL_DB_PASSWORD:-general-practice-db}
+      DB_PASSWORD: ${GENERAL_DB_PASSWORD:?Generate local DB password in root .env}
       DB_SSLMODE: disable
-      SECRET_KEY: ${GENERAL_SECRET_KEY:-general-classroom-session-key-2026-only}
+      SECRET_KEY: ${GENERAL_SECRET_KEY:?Generate a separate general session key in root .env}
       SESSION_COOKIE_SECURE: "false"
       EVENT_TOKEN: ${EVENT_TOKEN:?Generate the shared EVENT_TOKEN in root .env}
       ENABLE_SENTRY_TEST: "false"

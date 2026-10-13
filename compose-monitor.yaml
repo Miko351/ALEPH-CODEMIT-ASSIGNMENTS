@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: monitor
       POSTGRES_USER: monitor
-      POSTGRES_PASSWORD: ${MONITOR_DB_PASSWORD:-monitor-practice-db}
+      POSTGRES_PASSWORD: ${MONITOR_DB_PASSWORD:?Generate local DB password in root .env}
     volumes:
       - monitor-data:/var/lib/postgresql/data
       - ./monitor/backend/sql/docker-init.sql:/docker-entrypoint-initdb.d/001-init.sql:ro
@@ -23,9 +23,9 @@ services:
       DB_PORT: "5432"
       DB_NAME: monitor
       DB_USER: monitor
-      DB_PASSWORD: ${MONITOR_DB_PASSWORD:-monitor-practice-db}
+      DB_PASSWORD: ${MONITOR_DB_PASSWORD:?Generate local DB password in root .env}
       DB_SSLMODE: disable
-      SECRET_KEY: ${MONITOR_SECRET_KEY:-monitor-classroom-session-key-2026-only}
+      SECRET_KEY: ${MONITOR_SECRET_KEY:?Generate a separate monitor session key in root .env}
       SESSION_COOKIE_SECURE: "false"
       EVENT_TOKEN: ${EVENT_TOKEN:?Generate the shared EVENT_TOKEN in root .env}
       SENTRY_DSN: ""
