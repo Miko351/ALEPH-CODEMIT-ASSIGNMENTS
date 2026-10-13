@@ -28,6 +28,7 @@ export default function RootLayout({ children }) {
             <nav aria-label="주 메뉴">
               <Link href="/">홈</Link>
               <Link href="/notes">메모</Link>
+              <Link href="/db-notes">DB 메모</Link>
             </nav>
             <span className="header-label">ALEPH · NEXT PRACTICE</span>
           </div>

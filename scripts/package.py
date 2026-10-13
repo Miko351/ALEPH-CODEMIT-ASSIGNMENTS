@@ -39,6 +39,8 @@ def main():
             raise RuntimeError('ZIP integrity failed.')
         assert all(allowed(name) for name in archive.namelist())
         assert 'nextjs-notes/next-practice/app/notes/page.js' in archive.namelist()
+        for name in ('app/db-notes/page.js', 'components/DatabaseNotes.js', 'lib/api/notes.js', 'tests/db-notes.spec.js'):
+            assert f'nextjs-notes/next-practice/{name}' in archive.namelist()
         assert 'nextjs-notes/next-practice/mini-watch/monitor/next-frontend/package-lock.json' in archive.namelist()
     print(f'Created {destination.name}: {len(files)} files, {destination.stat().st_size} bytes; secrets/builds/installed packages excluded.')
 

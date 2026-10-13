@@ -1,0 +1,166 @@
+.db-login {
+  max-width: 390px;
+  margin: 70px auto;
+  padding: 30px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 12px;
+}
+.db-login h1 {
+  font-size: 24px;
+  margin-bottom: 13px;
+}
+.db-login form {
+  margin-top: 26px;
+}
+.db-login input,
+.note-compose input,
+.note-compose select {
+  width: 100%;
+  font-size: 12px;
+}
+.db-login label:not(:first-child),
+.note-compose form label:not(:first-child) {
+  margin-top: 17px;
+}
+.db-login .button {
+  width: 100%;
+  margin-top: 25px;
+}
+.db-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+.db-loading {
+  padding: 80px 20px;
+  text-align: center;
+  font-size: 12px;
+  color: #a89676;
+}
+.db-list-actions {
+  display: flex;
+  gap: 7px;
+}
+.db-list-actions .button {
+  font-size: 10px;
+  min-height: 33px;
+  padding: 7px 10px;
+}
+.db-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 330px;
+  overflow: auto;
+}
+.db-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 16px;
+  border: 1px solid #e7dece;
+  background: var(--white);
+  border-radius: 8px;
+}
+.db-list-item.selected {
+  background: #f2ecdf;
+  border-color: #c8b18d;
+}
+.db-list-item > span {
+  font: 10px monospace;
+  color: #b6a583;
+}
+.db-list-item strong {
+  font-size: 12px;
+  font-weight: 500;
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+.db-list-item small {
+  font-size: 9px;
+  color: #ac9773;
+  white-space: nowrap;
+}
+.db-detail {
+  margin-top: 20px;
+  background: #fffdf7;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 22px;
+}
+.db-detail-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+.db-detail-top .eyebrow {
+  font-size: 8px;
+  margin: 0;
+}
+.db-detail-top > div {
+  display: flex;
+  gap: 7px;
+}
+.db-detail-top .button {
+  font-size: 10px;
+  padding: 7px 10px;
+  min-height: 32px;
+}
+.db-detail h2 {
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+.db-detail .note-content {
+  font-size: 13px;
+  line-height: 2.1;
+  white-space: pre-wrap;
+}
+.field-error {
+  display: block;
+  font-size: 10px;
+  color: #b87b5c;
+  margin-top: 7px;
+}
+.db-error {
+  margin-top: 23px;
+}
+.db-heading h1 {
+  font-size: 30px;
+}
+@media (max-width: 650px) {
+  .db-login {
+    margin: 40px auto;
+    padding: 25px;
+  }
+  .db-heading h1 {
+    font-size: 25px;
+  }
+  .db-list-item {
+    gap: 9px;
+    padding: 14px;
+  }
+  .db-list-item strong {
+    font-size: 11px;
+  }
+  .db-list-item small {
+    font-size: 8px;
+  }
+  .db-detail {
+    padding: 19px;
+  }
+  .db-detail h2 {
+    font-size: 18px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

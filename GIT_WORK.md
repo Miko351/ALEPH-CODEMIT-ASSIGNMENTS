@@ -2112,3 +2112,77 @@ minsu.md
 [exit 0]
 ```
 
+## 2026-10-13: 기본 앱의 Flask·PostgreSQL 메모 API 검증
+
+심화 3·4 구현은 mini-watch/monitor/next-frontend에도 포함되어 있었지만, 기본 제출 앱에서 바로 확인하도록 `/db-notes`와 상단 **DB 메모** Link를 추가했다. app/db-notes/page.js → components/DatabaseNotes.js → lib/api/notes.js → next.config.mjs의 /api 프록시 → 기존 Flask 라우터 → psycopg 저장소 → PostgreSQL 순서로 동작한다. React state 전용 `/notes`도 유지한다.
+
+검증 환경: 기본 Next.js 프로덕션 앱 3100, 기존 monitor-dashboard/monitor/backend/app.py 5200, 실제 PostgreSQL 55433의 monitor_dashboard DB. Next.js API를 가짜 응답으로 대체하지 않았다. 테스트 계정은 기존 로컬 비공개 파일에서 환경 변수로만 읽었으며 비밀번호·쿠키는 출력하거나 제출하지 않았다.
+
+실행한 명령: 기본 앱 폴더에서 `npm run lint`, `npm run build` 성공 후 `npm test`. TEST_USERNAME·TEST_PASSWORD와 PLAYWRIGHT_BROWSERS_PATH는 프로세스 환경에 설정했다. 테스트 러너가 `npm run start -- --hostname 127.0.0.1 --port 3100`으로 빌드된 앱을 실행했다. 아래는 npm test의 실제 출력에서 테스트 결과와 메모 요청 기록을 발췌한 것이다.
+
+```text
+Running 14 tests using 6 workers
+  ok  3 [desktop] › tests\notes.spec.js:56:5 › 공백 등록·수정은 거절하고 원래 메모 보존 (1.3s)
+  ok  6 [desktop] › tests\notes.spec.js:94:5 › 수정 중인 ID를 삭제하면 해당 메모만 삭제하고 등록 폼으로 복귀 (1.4s)
+  ok  4 [desktop] › tests\notes.spec.js:75:5 › 수정 취소와 삭제 취소는 원래 내용 유지 (1.4s)
+  ok  5 [desktop] › tests\notes.spec.js:24:5 › 같은 내용 두 개를 고유 ID로 구별하고 한쪽만 수정 (1.5s)
+  ok  1 [desktop] › tests\notes.spec.js:3:5 › 홈의 카운터 증가·초기화와 Link 이동 (1.6s)
+  ok  7 [desktop] › tests\notes.spec.js:115:5 › 빈 목록과 새로고침 초기화, 반응형 화면 (984ms)
+[DB desktop] GET /api/notes -> 200
+  ok  9 [mobile] › tests\notes.spec.js:3:5 › 홈의 카운터 증가·초기화와 Link 이동 (872ms)
+[DB desktop] POST /api/notes -> 400
+  ok 10 [mobile] › tests\notes.spec.js:24:5 › 같은 내용 두 개를 고유 ID로 구별하고 한쪽만 수정 (1.0s)
+  ok 11 [mobile] › tests\notes.spec.js:56:5 › 공백 등록·수정은 거절하고 원래 메모 보존 (864ms)
+[DB mobile] GET /api/notes -> 200
+  ok 12 [mobile] › tests\notes.spec.js:94:5 › 수정 중인 ID를 삭제하면 해당 메모만 삭제하고 등록 폼으로 복귀 (631ms)
+[DB mobile] POST /api/notes -> 400
+[DB desktop] POST /api/notes -> 201
+[DB desktop] GET /api/notes -> 200
+[DB mobile] POST /api/notes -> 201
+  ok 13 [mobile] › tests\notes.spec.js:115:5 › 빈 목록과 새로고침 초기화, 반응형 화면 (914ms)
+[DB mobile] GET /api/notes -> 200
+[DB desktop] GET /api/notes -> 200
+  ok 14 [mobile] › tests\notes.spec.js:75:5 › 수정 취소와 삭제 취소는 원래 내용 유지 (651ms)
+[DB mobile] GET /api/notes -> 200
+[DB desktop] GET /api/notes/7 -> 200
+[DB desktop] PUT /api/notes/7 -> 400
+[DB mobile] GET /api/notes/8 -> 200
+[DB mobile] PUT /api/notes/8 -> 400
+[DB desktop] PUT /api/notes/7 -> 200
+[DB desktop] GET /api/notes -> 200
+[DB mobile] PUT /api/notes/8 -> 200
+[DB mobile] GET /api/notes -> 200
+[DB mobile] GET /api/notes -> 200
+[DB mobile] GET /api/notes/8 -> 200
+[DB mobile] 새로고침 후 수정한 본문과 처리 상태를 API에서 재조회하여 확인
+[DB desktop] GET /api/notes -> 200
+[DB desktop] GET /api/notes/7 -> 200
+[DB desktop] 새로고침 후 수정한 본문과 처리 상태를 API에서 재조회하여 확인
+[DB mobile] GET /api/notes/9 -> 404
+[DB mobile] GET /api/notes/8 -> 200
+[DB desktop] GET /api/notes/10 -> 404
+[DB desktop] GET /api/notes/7 -> 200
+[DB mobile] DELETE /api/notes/8 -> 200
+[DB mobile] GET /api/notes -> 200
+[DB mobile] GET /api/notes -> 200
+[DB desktop] DELETE /api/notes/7 -> 200
+[DB mobile] 삭제 취소: 메모 보존, 삭제 확정: 해당 ID만 삭제, 새로고침 후 API 목록에서 제거 확인
+[DB desktop] GET /api/notes -> 200
+  ok  8 [mobile] › tests\db-notes.spec.js:4:5 › 기존 Flask API의 로그인·DB 메모 CRUD·취소·오류·새로고침 유지 (5.9s)
+[DB desktop] GET /api/notes -> 200
+[DB desktop] 삭제 취소: 메모 보존, 삭제 확정: 해당 ID만 삭제, 새로고침 후 API 목록에서 제거 확인
+  ok  2 [desktop] › tests\db-notes.spec.js:4:5 › 기존 Flask API의 로그인·DB 메모 CRUD·취소·오류·새로고침 유지 (9.5s)
+  14 passed (11.7s)
+```
+
+tests/db-notes.spec.js의 데스크톱·모바일 시나리오는 다음 결과를 실제 응답과 화면에서 단언했다.
+
+- 홈의 Link로 DB 화면에 이동하고 로그인 없이 메모 API를 호출하면 401. 잘못된 비밀번호 안내 후 올바른 계정으로 로그인.
+- 빈 본문 등록은 400이며 목록에 추가되지 않음. 정상 등록은 201이며 목록·상세와 새로고침 후 상세에서 DB 내용을 확인.
+- 수정 폼에서 기존 내용을 조회. 수정 취소 시 내용 보존. 공백 수정은 400이며 GET 상세로 기존 내용 보존 확인.
+- 정상 수정은 200. 새로고침 뒤 GET 상세에서 수정 본문과 completed 상태를 확인.
+- 실제 임시 메모를 생성·삭제한 뒤 그 번호에 GET 요청하여 Flask의 404 JSON을 React 오류 안내로 표시. 이 확인에는 실제 삭제된 번호를 요청하도록 URL만 전환하고 응답은 가공하지 않음.
+- 삭제 취소 뒤 GET 상세는 200. 삭제 확정 뒤 해당 번호의 조회·수정·삭제는 모두 404. 새로고침 후 API 목록에서도 같은 ID가 없음.
+- 테스트에서 만든 무작위 제목의 메모만 정리. 기존 메모는 보존. 로그아웃 후 보호 API는 다시 401.
+
+결과: 기본 state 테스트 12개와 실제 DB 통합 테스트 2개, 총 14개 통과. 설치·DB·계정·API 준비와 계정 환경 변수 설정 방법은 README.md에 있다. 계정을 설정하지 않은 실행에서는 DB 테스트 두 개를 명시적으로 skip한다.
