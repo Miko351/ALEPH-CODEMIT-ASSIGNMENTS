@@ -255,3 +255,5 @@ index 45b1a49..592c668 100644
 
  def test_build_commands_and_gateway_routes():
 ```
+
+Docker 실제 실행 보완 커밋: bff83bf63ea292cc7afcbe1f8a1ef8fb212a77ba — 화면용 bridge 망에서 gateway 포트 게시를 복구하고 실제 Docker 브라우저 테스트 및 down/up DB 보존 확인 도구를 추가했다.
