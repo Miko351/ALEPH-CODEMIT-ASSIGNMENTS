@@ -84,7 +84,7 @@ D:\ALEPH_Codemit\nextjs-notes\git-practice-jiyun
 
 심화 충돌 실습은 [민수 제목 변경 #4](https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/4)와 [지윤 제목 변경·충돌 해결 #5](https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/5)입니다. checklist.md의 같은 첫 줄을 다르게 변경하고 첫 PR 병합 후 다른 작업 브랜치에서 최신 main을 merge해 실제 충돌을 만들었습니다. 두 역할을 함께 나타내는 제목으로 로컬 해결·커밋·push하고 **같은 PR**을 병합한 뒤 양쪽 pull을 완료했습니다. 선택 이유와 실제 충돌 표식도 GIT_WORK.md에 남겼습니다.
 
-앱 개선 PR은 GIT_WORK.md의 앱 브랜치 실습 절에 기록합니다. 프로젝트 소스와 실습 문서를 분리하려는 저장소 구성에 따라 앱 PR의 base는 next-practice입니다. 안정 브랜치에서 새 작업 브랜치 → 로컬 수정·검증·커밋 → push → PR diff 검토 → merge commit 병합 → 로컬 pull 순서를 그대로 사용합니다.
+앱 개선은 [빈 목록 안내 개선 PR #6](https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/6)에서 실제 진행했습니다. components/Notes.js와 tests/notes.spec.js를 로컬에서 바꾸고 lint·build·데스크톱/모바일 빈 목록 테스트를 통과한 뒤 커밋·push했습니다. 실제 diff를 읽고 merge commit으로 병합한 뒤 로컬 next-practice에서 pull하고 작업 브랜치를 정리했습니다. 프로젝트 소스와 실습 문서를 분리하려는 저장소 구성에 따라 앱 PR의 base는 next-practice입니다. 상세 명령·출력·변경 파일·검토 결과는 GIT_WORK.md에 있습니다.
 
 ## 심화: 기존 Flask·PostgreSQL API를 사용하는 Next.js 메모
 
@@ -168,5 +168,14 @@ set TEST_PASSWORD=
 ZIP에는 Next.js 소스·두 package.json과 package-lock.json·README·GIT_WORK.md·Git 실습 문서·SQL·설정 예시·DB 준비 도구·테스트를 포함합니다. 실제 .env·계정 비밀번호·토큰·DB·node_modules·.next·가상환경·캐시·Git 내부 디렉터리는 제외합니다. 압축 생성 도구는 scripts/package.py이며 Python 기본 라이브러리만 사용합니다.
 
 ZIP의 Git 작업 기록에는 실제 PR의 base·head·커밋·변경 파일·Merged 상태와 원본 PR 링크를 포함하므로 공개 저장소에서 교차 확인할 수 있습니다. 앱 제출 링크는 저장소 첫 화면 대신 next-practice 브랜치 주소를 사용하세요. default는 파일 없이 유지합니다.
+
+로컬에서 ZIP을 다시 생성하려면:
+
+```cmd
+cd /d D:\ALEPH_Codemit\nextjs-notes\next-practice
+python scripts\package.py
+```
+
+결과는 상위 과제 폴더 `D:\ALEPH_Codemit\nextjs-notes\nextjs-notes.zip`에 생성합니다. Git 실습 clone이 없는 GitHub 소스만 내려받은 경우, 위의 두 실습 폴더를 main 브랜치로 clone한 뒤 실행하세요. ZIP에는 두 실습 폴더의 최종 문서를 넣으며 Git 내부 데이터 대신 GIT_WORK.md와 공개 원본 PR로 과정과 병합을 확인합니다.
 
 공식 참고: [Next.js create-next-app](https://nextjs.org/docs/app/api-reference/cli/create-next-app), [페이지와 레이아웃](https://nextjs.org/docs/app/getting-started/layouts-and-pages), [Server·Client Components](https://nextjs.org/docs/app/getting-started/server-and-client-components), [GitHub Flow](https://docs.github.com/en/get-started/using-github/github-flow).

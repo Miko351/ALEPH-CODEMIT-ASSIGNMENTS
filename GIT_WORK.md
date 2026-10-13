@@ -1,5 +1,5 @@
 # Git 작업 기록 — 두 clone과 실제 GitHub PR
-작성·확인 날짜: 2026-10-12 (한국 시간). 모든 소스·문서는 먼저 로컬에서 작성·검증·커밋하고 push했습니다. GitHub 웹에서 소스 파일을 직접 작성하지 않았습니다. PR 생성·본문 검토 기록·병합은 GitHub CLI로 실행했습니다.
+작성·확인 날짜: 2026-10-13 (한국 시간). Git 실습은 10월 12일부터 진행했으며 개별 PR의 실제 병합 시각은 아래 원본 metadata로 확인할 수 있습니다. 모든 소스·문서는 먼저 로컬에서 작성·검증·커밋하고 push했습니다. GitHub 웹에서 소스 파일을 직접 작성하지 않았습니다. PR 생성·본문 검토 기록·병합은 GitHub CLI로 실행했습니다.
 저장소: https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS
 기본 브랜치 default는 파일 없는 초기 커밋을 유지합니다. main은 민수·지윤·점검표 Git 실습의 병합 기준입니다. 이전 세 과제와 이번 앱 소스는 각각 별도 브랜치에 보관합니다.
 ## 실제 clone 폴더와 초기 준비
@@ -23,6 +23,7 @@ Switched to a new branch 'feature/jiyun'
 | 필수 3 · 최신 main의 점검표 | [PR #3](https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/3) | `main` | `feature/checklist` | **MERGED** | `checklist.md` |
 | 심화 · 같은 첫 줄의 민수 제목 변경 | [PR #4](https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/4) | `main` | `feature/minsu-title` | **MERGED** | `checklist.md` |
 | 심화 · 지윤 제목 충돌 해결 | [PR #5](https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/5) | `main` | `feature/jiyun-title` | **MERGED** | `checklist.md` |
+| 심화 · Next.js 빈 목록 안내 개선 | [PR #6](https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/6) | `next-practice` | `feature/note-feedback` | **MERGED** | `components/Notes.js`, `tests/notes.spec.js` |
 
 ### 필수 1 · 민수 역할 문서와 보완 커밋
 
@@ -119,6 +120,27 @@ checklist.md 첫 줄에서 실제 merge 충돌을 해결했습니다.
 양쪽의 역할을 제목에 함께 남기는 내용을 선택했습니다. 최신 main을 작업 브랜치로 merge하고 로컬에서 충돌 표식을 제거·커밋·push했습니다. 같은 PR의 Files changed를 다시 읽어 제목과 나머지 점검 항목 보존을 확인했습니다.
 
 
+### 심화 · Next.js 빈 목록 안내 개선
+
+원본: https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/6
+
+작업 커밋:
+
+- `d6fbcd0bcfcc4ce9e5292f5a9687f308dca70542` — Explain first-note action and refresh behavior in empty collection
+
+병합 커밋: `756ab2a626a894ce47b1350638de54f27d3bdbc7`. GitHub API에서 부모 커밋 2개를 확인하여 merge commit 방식임을 검증했습니다. 병합 시각(원본 UTC): 2026-10-13T01:12:17Z.
+
+PR 본문에 남긴 실제 변경·검토 설명:
+
+메모가 비었을 때 작성 위치와 새로고침 결과를 안내하도록 개선합니다. components/Notes.js의 빈 목록 문구를 바꾸고 tests/notes.spec.js에서 실제 빈 목록 화면 안내를 확인합니다.
+
+저장소의 프로젝트 보관 방식에 맞춰 base는 next-practice이며, 일반 Git 실습의 main과 프로젝트 소스를 분리합니다. 최신 안정 브랜치에서 작업 브랜치를 만들어 로컬에서 수정했습니다.
+
+검증: lint, 프로덕션 build, 실제 start 앱의 데스크톱·모바일 빈 목록 브라우저 테스트 2개 통과.
+
+직접 실제 PR diff를 읽어 메모 동작 로직은 바뀌지 않고 안내 문구와 해당 사용자 흐름의 검사만 변경되었음을 확인했습니다. 확인 화면은 로컬 .cache/notes-desktop.png와 notes-mobile.png로 남겼으며 제출 기록은 GIT_WORK.md에 포함합니다.
+
+
 ## 전환 위치·로컬 merge 방향·양쪽 pull
 
 민수는 git-practice-minsu, 지윤은 git-practice-jiyun 폴더에서 main과 자기 작업 브랜치를 오갔습니다. 역할 파일을 커밋한 작업 브랜치에는 파일이 있고, 병합 전 main에는 없음을 git ls-files로 확인했습니다. 각 main에서 `git merge feature/minsu` 또는 `git merge feature/jiyun`을 실행해 **main이 변경을 받는 방향**을 확인했습니다. 이 로컬 merge는 fast-forward였으며 main을 직접 push하지 않았습니다. GitHub의 PR은 별도로 Create a merge commit 방식으로 병합했습니다.
@@ -133,7 +155,7 @@ checklist.md 첫 줄에서 실제 merge 충돌을 해결했습니다.
 
 ## 심화: 앱 작업 브랜치
 
-앱의 안정 기준 브랜치는 next-practice입니다. 앱 개선 PR의 실제 기록은 완료 후 이 절에 추가합니다.
+앱 소스를 main에 섞지 않는 저장소 구성에 따라 next-practice를 앱의 안정 기준 브랜치로 사용합니다. 그 최신 상태에서 feature/note-feedback을 만들고 빈 목록 안내를 개선했습니다. 로컬 빌드·빈 목록 브라우저 테스트·커밋 뒤 push하여 PR을 만들고 실제 변경 파일을 읽어 merge commit으로 병합했습니다. 이후 로컬 next-practice에서 pull하고 완료한 작업 브랜치를 정리했습니다. 이 PR은 Git 실습용 main 대상 PR 세 개와 별도로 기록합니다.
 
 ## 두 질문에 대한 답
 
@@ -1492,6 +1514,506 @@ To https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS.git
 
 ```text
 > gh api repos/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/git/commits/3efd941bcd014b66d4714ee880330a9651aac10b --jq ".parents | length"
+2
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\git-practice-minsu`
+
+```text
+> git remote -v
+origin	https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS.git (fetch)
+origin	https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS.git (push)
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\git-practice-minsu`
+
+```text
+> git branch -vv
+* main 3efd941 [origin/main] Merge pull request #5 from Miko351/feature/jiyun-title
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\git-practice-minsu`
+
+```text
+> git reflog show main "--format=%h %gs" -8
+3efd941 pull --ff-only origin main: Fast-forward
+615de75 pull --ff-only origin main: Fast-forward
+dbec799 pull --ff-only origin main: Fast-forward
+9d5f420 merge feature/minsu: Fast-forward
+b7ae56a clone: from https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS.git
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\git-practice-minsu`
+
+```text
+> git rev-parse HEAD
+3efd941bcd014b66d4714ee880330a9651aac10b
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\git-practice-minsu`
+
+```text
+> git ls-files
+checklist.md
+jiyun.md
+minsu.md
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\git-practice-jiyun`
+
+```text
+> git remote -v
+origin	https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS.git (fetch)
+origin	https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS.git (push)
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\git-practice-jiyun`
+
+```text
+> git branch -vv
+* main 3efd941 [origin/main] Merge pull request #5 from Miko351/feature/jiyun-title
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\git-practice-jiyun`
+
+```text
+> git reflog show main "--format=%h %gs" -8
+3efd941 pull --ff-only origin main: Fast-forward
+615de75 pull --ff-only origin main: Fast-forward
+dbec799 pull --ff-only origin main: Fast-forward
+ad58380 merge feature/jiyun: Fast-forward
+b7ae56a clone: from https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS.git
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\git-practice-jiyun`
+
+```text
+> git rev-parse HEAD
+3efd941bcd014b66d4714ee880330a9651aac10b
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\git-practice-jiyun`
+
+```text
+> git ls-files
+checklist.md
+jiyun.md
+minsu.md
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> git switch next-practice
+Your branch is up to date with 'origin/next-practice'.
+Already on 'next-practice'
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> git pull --ff-only origin next-practice
+Already up to date.
+From https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS
+ * branch            next-practice -> FETCH_HEAD
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> git switch -c feature/note-feedback next-practice
+Switched to a new branch 'feature/note-feedback'
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> node D:\ALEPH_Codemit\sign-up\frontend\node_modules\prettier\bin\prettier.cjs --write components/Notes.js tests/notes.spec.js
+components/Notes.js 64ms
+tests/notes.spec.js 29ms
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> node "C:/Program Files/nodejs/node_modules/npm/bin/npm-cli.js" run lint
+> next-practice@0.1.0 lint
+> eslint
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> node "C:/Program Files/nodejs/node_modules/npm/bin/npm-cli.js" run build
+> next-practice@0.1.0 build
+> next build
+
+▲ Next.js 16.4.0 (Turbopack)
+✓ Running next.config.mjs took 50ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 2.1s
+  Running TypeScript ...
+  Finished TypeScript in 2ms ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/6) ...
+  Generating static pages using 7 workers (1/6) 
+  Generating static pages using 7 workers (2/6) 
+  Generating static pages using 7 workers (4/6) 
+✓ Generating static pages using 7 workers (6/6) in 846ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /icon.svg
+└ ○ /notes
+
+
+○  (Static)  prerendered as static content
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> node "C:/Program Files/nodejs/node_modules/npm/bin/npm-cli.js" test -- --grep "빈 목록"
+> next-practice@0.1.0 test
+> playwright test --grep 빈 목록
+
+
+Running 2 tests using 2 workers
+
+  ok 2 [mobile] › tests\notes.spec.js:115:5 › 빈 목록과 새로고침 초기화, 반응형 화면 (999ms)
+  ok 1 [desktop] › tests\notes.spec.js:115:5 › 빈 목록과 새로고침 초기화, 반응형 화면 (1.0s)
+
+  2 passed (3.6s)
+[WebServer] (node:33412) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:33668) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+(node:5884) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:31296) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> git diff -- components/Notes.js tests/notes.spec.js
+diff --git a/components/Notes.js b/components/Notes.js
+index 28f927e..efa0bf6 100644
+--- a/components/Notes.js
++++ b/components/Notes.js
+@@ -187,7 +187,10 @@ export default function Notes() {
+           <div className="empty-notes">
+             <Icon name="notebook" size={36} />
+             <h3>등록된 메모가 없습니다.</h3>
+-            <p>새로운 생각을 첫 메모로 남겨 보세요.</p>
++            <p>
++              작성 칸에서 첫 메모를 남겨 보세요. 새로고침하면 초기 메모로
++              돌아옵니다.
++            </p>
+           </div>
+         )}
+         <div className="notes-bottom-note">
+diff --git a/tests/notes.spec.js b/tests/notes.spec.js
+index 8cf73a2..2408fcf 100644
+--- a/tests/notes.spec.js
++++ b/tests/notes.spec.js
+@@ -128,6 +128,12 @@ test("빈 목록과 새로고침 초기화, 반응형 화면", async ({ page },
+   await expect(
+     page.getByRole("heading", { name: "등록된 메모가 없습니다." }),
+   ).toBeVisible();
++  await expect(
++    page.getByText(
++      "작성 칸에서 첫 메모를 남겨 보세요. 새로고침하면 초기 메모로 돌아옵니다.",
++      { exact: true },
++    ),
++  ).toBeVisible();
+   await page.reload();
+   await expect(page.locator("article[data-note-id]")).toHaveCount(2);
+   expect(
+warning: in the working copy of 'components/Notes.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/notes.spec.js', LF will be replaced by CRLF the next time Git touches it
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> git add components/Notes.js tests/notes.spec.js
+warning: in the working copy of 'components/Notes.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/notes.spec.js', LF will be replaced by CRLF the next time Git touches it
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> git commit -m "Explain first-note action and refresh behavior in empty collection"
+[feature/note-feedback d6fbcd0] Explain first-note action and refresh behavior in empty collection
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> git push -u origin feature/note-feedback
+branch 'feature/note-feedback' set up to track 'origin/feature/note-feedback'.
+remote: 
+remote: Create a pull request for 'feature/note-feedback' on GitHub by visiting:        
+remote:      https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/new/feature/note-feedback        
+remote: 
+To https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS.git
+ * [new branch]      feature/note-feedback -> feature/note-feedback
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> gh pr create --repo Miko351/ALEPH-CODEMIT-ASSIGNMENTS --base next-practice --head feature/note-feedback --title "Improve empty collection guidance in Next.js notes app" --body-file D:\ALEPH_Codemit\nextjs-notes\.cache\app-pr-body.md
+https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/6
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> gh pr diff https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/6 --repo Miko351/ALEPH-CODEMIT-ASSIGNMENTS
+diff --git a/components/Notes.js b/components/Notes.js
+index 28f927e..efa0bf6 100644
+--- a/components/Notes.js
++++ b/components/Notes.js
+@@ -187,7 +187,10 @@ export default function Notes() {
+           <div className="empty-notes">
+             <Icon name="notebook" size={36} />
+             <h3>등록된 메모가 없습니다.</h3>
+-            <p>새로운 생각을 첫 메모로 남겨 보세요.</p>
++            <p>
++              작성 칸에서 첫 메모를 남겨 보세요. 새로고침하면 초기 메모로
++              돌아옵니다.
++            </p>
+           </div>
+         )}
+         <div className="notes-bottom-note">
+diff --git a/tests/notes.spec.js b/tests/notes.spec.js
+index 8cf73a2..2408fcf 100644
+--- a/tests/notes.spec.js
++++ b/tests/notes.spec.js
+@@ -128,6 +128,12 @@ test("빈 목록과 새로고침 초기화, 반응형 화면", async ({ page },
+   await expect(
+     page.getByRole("heading", { name: "등록된 메모가 없습니다." }),
+   ).toBeVisible();
++  await expect(
++    page.getByText(
++      "작성 칸에서 첫 메모를 남겨 보세요. 새로고침하면 초기 메모로 돌아옵니다.",
++      { exact: true },
++    ),
++  ).toBeVisible();
+   await page.reload();
+   await expect(page.locator("article[data-note-id]")).toHaveCount(2);
+   expect(
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> gh pr view https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/6 --repo Miko351/ALEPH-CODEMIT-ASSIGNMENTS --json url,state,baseRefName,headRefName,files,commits
+{"baseRefName":"next-practice","commits":[{"authoredDate":"2026-10-13T01:11:13Z","authors":[{"email":"miko351563@gmail.com","id":"U_kgDODRT7UA","login":"Miko351","name":"Miko351"}],"committedDate":"2026-10-13T01:11:13Z","messageBody":"","messageHeadline":"Explain first-note action and refresh behavior in empty collection","oid":"d6fbcd0bcfcc4ce9e5292f5a9687f308dca70542"}],"files":[{"path":"components/Notes.js","additions":4,"deletions":1,"changeType":"MODIFIED"},{"path":"tests/notes.spec.js","additions":6,"deletions":0,"changeType":"MODIFIED"}],"headRefName":"feature/note-feedback","state":"OPEN","url":"https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/6"}
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> gh pr edit https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/6 --repo Miko351/ALEPH-CODEMIT-ASSIGNMENTS --body-file D:\ALEPH_Codemit\nextjs-notes\.cache\app-pr-body.md
+https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/6
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> gh pr merge https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/6 --repo Miko351/ALEPH-CODEMIT-ASSIGNMENTS --merge
+(출력 없음)
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> gh pr view https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/6 --repo Miko351/ALEPH-CODEMIT-ASSIGNMENTS --json url,state,mergedAt,mergeCommit,baseRefName,headRefName,files,commits
+{"baseRefName":"next-practice","commits":[{"authoredDate":"2026-10-13T01:11:13Z","authors":[{"email":"miko351563@gmail.com","id":"U_kgDODRT7UA","login":"Miko351","name":"Miko351"}],"committedDate":"2026-10-13T01:11:13Z","messageBody":"","messageHeadline":"Explain first-note action and refresh behavior in empty collection","oid":"d6fbcd0bcfcc4ce9e5292f5a9687f308dca70542"}],"files":[{"path":"components/Notes.js","additions":4,"deletions":1,"changeType":"MODIFIED"},{"path":"tests/notes.spec.js","additions":6,"deletions":0,"changeType":"MODIFIED"}],"headRefName":"feature/note-feedback","mergeCommit":{"oid":"756ab2a626a894ce47b1350638de54f27d3bdbc7"},"mergedAt":"2026-10-13T01:12:17Z","state":"MERGED","url":"https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/6"}
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> git switch next-practice
+Your branch is up to date with 'origin/next-practice'.
+Switched to branch 'next-practice'
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> git pull --ff-only origin next-practice
+Updating a03ed88..756ab2a
+Fast-forward
+ components/Notes.js | 5 ++++-
+ tests/notes.spec.js | 6 ++++++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+From https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS
+ * branch            next-practice -> FETCH_HEAD
+   a03ed88..756ab2a  next-practice -> origin/next-practice
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> git branch -d feature/note-feedback
+Deleted branch feature/note-feedback (was d6fbcd0).
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> git push origin --delete feature/note-feedback
+To https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS.git
+ - [deleted]         feature/note-feedback
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> git fetch --prune origin
+From https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS
+ - [deleted]         (none)     -> origin/feature/checklist
+ - [deleted]         (none)     -> origin/feature/jiyun
+ - [deleted]         (none)     -> origin/feature/minsu
+   b7ae56a..3efd941  main       -> origin/main
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> gh pr view https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/1 --repo Miko351/ALEPH-CODEMIT-ASSIGNMENTS --json url,title,state,baseRefName,headRefName,mergedAt,mergeCommit,commits,files,body
+{"baseRefName":"main","body":"Minsu 역할의 Git 협업 실습 문서를 추가합니다. 작업 브랜치에서 커밋하고 로컬 main으로 이동하여 merge 방향과 파일 차이를 확인했습니다.\r\n\r\n변경 파일: `minsu.md`. Base: `main`, head: `feature/minsu`.\r\n\r\nPR 생성 후 같은 작업 브랜치에 보완 커밋을 추가했습니다. 문서에 로컬 merge와 원격 PR 병합의 차이를 설명했습니다.\r\n\r\n직접 Files changed의 실제 diff와 커밋 목록을 읽었습니다. 역할 문서 외 다른 프로젝트 파일이 변경되지 않았고, 내용과 main으로의 병합 방향을 확인했습니다. 단독 실습이므로 자신의 PR에 Approve를 제출하지 않습니다.\r\n","commits":[{"authoredDate":"2026-10-12T07:44:43Z","authors":[{"email":"miko351563@gmail.com","id":"U_kgDODRT7UA","login":"Miko351","name":"Miko351"}],"committedDate":"2026-10-12T07:44:43Z","messageBody":"","messageHeadline":"Add Minsu collaboration practice record","oid":"9d5f4207b82e0a22cc12e30a3999eb532174d816"},{"authoredDate":"2026-10-12T07:44:55Z","authors":[{"email":"miko351563@gmail.com","id":"U_kgDODRT7UA","login":"Miko351","name":"Miko351"}],"committedDate":"2026-10-12T07:44:55Z","messageBody":"","messageHeadline":"Clarify local merge direction and remote pull after opening PR","oid":"6bad01aa16e08bcb19fe537e6fe627b383e8acf2"}],"files":[{"path":"minsu.md","additions":10,"deletions":0,"changeType":"ADDED"}],"headRefName":"feature/minsu","mergeCommit":{"oid":"45a550d8e3b6670a60950bc2b7ab79b598ec3ec6"},"mergedAt":"2026-10-12T07:52:53Z","state":"MERGED","title":"Add Minsu Git collaboration practice document","url":"https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/1"}
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> gh api repos/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/git/commits/45a550d8e3b6670a60950bc2b7ab79b598ec3ec6 --jq ".parents | length"
+2
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> gh pr view https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/2 --repo Miko351/ALEPH-CODEMIT-ASSIGNMENTS --json url,title,state,baseRefName,headRefName,mergedAt,mergeCommit,commits,files,body
+{"baseRefName":"main","body":"Jiyun 역할의 Git 협업 실습 문서를 추가합니다. 작업 브랜치에서 커밋하고 로컬 main으로 이동하여 merge 방향과 파일 차이를 확인했습니다.\r\n\r\n변경 파일: `jiyun.md`. Base: `main`, head: `feature/jiyun`.\r\n\r\n직접 Files changed의 실제 diff와 커밋 목록을 읽었습니다. 역할 문서 외 다른 프로젝트 파일이 변경되지 않았고, 내용과 main으로의 병합 방향을 확인했습니다. 단독 실습이므로 자신의 PR에 Approve를 제출하지 않습니다.\r\n","commits":[{"authoredDate":"2026-10-12T07:44:50Z","authors":[{"email":"miko351563@gmail.com","id":"U_kgDODRT7UA","login":"Miko351","name":"Miko351"}],"committedDate":"2026-10-12T07:44:50Z","messageBody":"","messageHeadline":"Add Jiyun collaboration practice record","oid":"ad583805ad91058a76b9a9a91a7292640ca1b17a"}],"files":[{"path":"jiyun.md","additions":6,"deletions":0,"changeType":"ADDED"}],"headRefName":"feature/jiyun","mergeCommit":{"oid":"dbec7990103817b39bbe9c5a495bc38473dfc978"},"mergedAt":"2026-10-12T07:52:57Z","state":"MERGED","title":"Add Jiyun Git collaboration practice document","url":"https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/2"}
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> gh api repos/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/git/commits/dbec7990103817b39bbe9c5a495bc38473dfc978 --jq ".parents | length"
+2
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> gh pr view https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/3 --repo Miko351/ALEPH-CODEMIT-ASSIGNMENTS --json url,title,state,baseRefName,headRefName,mergedAt,mergeCommit,commits,files,body
+{"baseRefName":"main","body":"두 초기 PR을 merge commit으로 병합한 뒤 두 clone의 main에서 pull한 결과를 점검표로 기록합니다.\r\n\r\n변경 파일: `checklist.md`. 최신 main에서 새 브랜치를 만들었습니다. 로컬 diff를 직접 확인했고 체크한 항목은 실제 Git 명령 출력으로 확인한 작업입니다.\r\n","commits":[{"authoredDate":"2026-10-12T07:53:17Z","authors":[{"email":"miko351563@gmail.com","id":"U_kgDODRT7UA","login":"Miko351","name":"Miko351"}],"committedDate":"2026-10-12T07:53:17Z","messageBody":"","messageHeadline":"Add verified Git collaboration checklist after both initial PRs","oid":"4ec2e640188faff1cf5d91cd47dc64f76781f4e2"}],"files":[{"path":"checklist.md","additions":11,"deletions":0,"changeType":"ADDED"}],"headRefName":"feature/checklist","mergeCommit":{"oid":"615de754dcfb3d85b0b83ba8dc08b450354df575"},"mergedAt":"2026-10-12T07:55:50Z","state":"MERGED","title":"Add verified collaboration checklist from latest main","url":"https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/3"}
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> gh api repos/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/git/commits/615de754dcfb3d85b0b83ba8dc08b450354df575 --jq ".parents | length"
+2
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> gh pr view https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/4 --repo Miko351/ALEPH-CODEMIT-ASSIGNMENTS --json url,title,state,baseRefName,headRefName,mergedAt,mergeCommit,commits,files,body
+{"baseRefName":"main","body":"같은 줄 충돌 해결 실습을 위해 checklist.md의 첫 제목을 # Git 협업 확인 — 민수의 관점로 변경합니다. 로컬 diff를 직접 읽어 첫 줄만 바뀌었음을 확인했습니다.\r\n","commits":[{"authoredDate":"2026-10-12T08:00:38Z","authors":[{"email":"miko351563@gmail.com","id":"U_kgDODRT7UA","login":"Miko351","name":"Miko351"}],"committedDate":"2026-10-12T08:00:38Z","messageBody":"","messageHeadline":"Change shared checklist title from Minsu perspective","oid":"788bafc418e34d652fc68d9754d7c3d11ab5a9f8"}],"files":[{"path":"checklist.md","additions":1,"deletions":1,"changeType":"MODIFIED"}],"headRefName":"feature/minsu-title","mergeCommit":{"oid":"3b014b590b12038414c81a408d9ead75c7c22fc8"},"mergedAt":"2026-10-12T08:04:37Z","state":"MERGED","title":"Update shared checklist title from Minsu perspective","url":"https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/4"}
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> gh api repos/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/git/commits/3b014b590b12038414c81a408d9ead75c7c22fc8 --jq ".parents | length"
+2
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> gh pr view https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/5 --repo Miko351/ALEPH-CODEMIT-ASSIGNMENTS --json url,title,state,baseRefName,headRefName,mergedAt,mergeCommit,commits,files,body
+{"baseRefName":"main","body":"checklist.md 첫 줄에서 실제 merge 충돌을 해결했습니다.\r\n\r\n민수 변경: Git 협업 확인 — 민수의 관점\r\n지윤 변경: Git 협업 확인 — 지윤의 관점\r\n최종 내용: Git 협업 확인 — 민수와 지윤의 공동 점검\r\n\r\n양쪽의 역할을 제목에 함께 남기는 내용을 선택했습니다. 최신 main을 작업 브랜치로 merge하고 로컬에서 충돌 표식을 제거·커밋·push했습니다. 같은 PR의 Files changed를 다시 읽어 제목과 나머지 점검 항목 보존을 확인했습니다.\r\n","commits":[{"authoredDate":"2026-10-12T08:00:46Z","authors":[{"email":"miko351563@gmail.com","id":"U_kgDODRT7UA","login":"Miko351","name":"Miko351"}],"committedDate":"2026-10-12T08:00:46Z","messageBody":"","messageHeadline":"Change shared checklist title from Jiyun perspective","oid":"7bd9366ca06721dbd135db50d6e9e3ce001e887d"},{"authoredDate":"2026-10-12T08:04:55Z","authors":[{"email":"miko351563@gmail.com","id":"U_kgDODRT7UA","login":"Miko351","name":"Miko351"}],"committedDate":"2026-10-12T08:04:55Z","messageBody":"…ives","messageHeadline":"Resolve same-line checklist title conflict by retaining both perspect…","oid":"93ad058e775b89c5d379e8fe08f934727f4838cc"}],"files":[{"path":"checklist.md","additions":1,"deletions":1,"changeType":"MODIFIED"}],"headRefName":"feature/jiyun-title","mergeCommit":{"oid":"3efd941bcd014b66d4714ee880330a9651aac10b"},"mergedAt":"2026-10-12T08:04:47Z","state":"MERGED","title":"Update shared checklist title from Jiyun perspective","url":"https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/5"}
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> gh api repos/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/git/commits/3efd941bcd014b66d4714ee880330a9651aac10b --jq ".parents | length"
+2
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> gh pr view https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/6 --repo Miko351/ALEPH-CODEMIT-ASSIGNMENTS --json url,title,state,baseRefName,headRefName,mergedAt,mergeCommit,commits,files,body
+{"baseRefName":"next-practice","body":"메모가 비었을 때 작성 위치와 새로고침 결과를 안내하도록 개선합니다. components/Notes.js의 빈 목록 문구를 바꾸고 tests/notes.spec.js에서 실제 빈 목록 화면 안내를 확인합니다.\r\n\r\n저장소의 프로젝트 보관 방식에 맞춰 base는 next-practice이며, 일반 Git 실습의 main과 프로젝트 소스를 분리합니다. 최신 안정 브랜치에서 작업 브랜치를 만들어 로컬에서 수정했습니다.\r\n\r\n검증: lint, 프로덕션 build, 실제 start 앱의 데스크톱·모바일 빈 목록 브라우저 테스트 2개 통과.\r\n\r\n직접 실제 PR diff를 읽어 메모 동작 로직은 바뀌지 않고 안내 문구와 해당 사용자 흐름의 검사만 변경되었음을 확인했습니다. 확인 화면은 로컬 .cache/notes-desktop.png와 notes-mobile.png로 남겼으며 제출 기록은 GIT_WORK.md에 포함합니다.\r\n","commits":[{"authoredDate":"2026-10-13T01:11:13Z","authors":[{"email":"miko351563@gmail.com","id":"U_kgDODRT7UA","login":"Miko351","name":"Miko351"}],"committedDate":"2026-10-13T01:11:13Z","messageBody":"","messageHeadline":"Explain first-note action and refresh behavior in empty collection","oid":"d6fbcd0bcfcc4ce9e5292f5a9687f308dca70542"}],"files":[{"path":"components/Notes.js","additions":4,"deletions":1,"changeType":"MODIFIED"},{"path":"tests/notes.spec.js","additions":6,"deletions":0,"changeType":"MODIFIED"}],"headRefName":"feature/note-feedback","mergeCommit":{"oid":"756ab2a626a894ce47b1350638de54f27d3bdbc7"},"mergedAt":"2026-10-13T01:12:17Z","state":"MERGED","title":"Improve empty collection guidance in Next.js notes app","url":"https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/6"}
+[exit 0]
+```
+
+### `D:\ALEPH_Codemit\nextjs-notes\next-practice`
+
+```text
+> gh api repos/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/git/commits/756ab2a626a894ce47b1350638de54f27d3bdbc7 --jq ".parents | length"
 2
 [exit 0]
 ```
