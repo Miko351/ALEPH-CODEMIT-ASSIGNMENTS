@@ -98,4 +98,6 @@ python -m venv .venv
 
 연결·재현 커밋 e3d22b33092826d7d3aa9ec27d4bcbbc29e2605b, 오류 수정 커밋 8c29e2e71fcc2101dcdf7c5984792fc5f3214904. 수정 파일·함수·원인·효과와 diff는 README에 포함한다.
 
+통합 검증·배포 문서 커밋: e56006d09baf05178dc42b2f353de59d48eb71a9. 기존 과제용 공개 기본 키·비밀번호 대신 개인 로컬 설정을 필수로 요구하도록 보완한 커밋: 8b5276b. 모든 작업은 로컬 수정·검증·커밋 후 day2-deploy로 push했다.
+
 참고: [Render Docker 설정](https://render.com/docs/blueprint-spec), [Supabase PostgreSQL 연결](https://supabase.com/docs/guides/database/connecting-to-postgres), [Waitress 실행](https://docs.pylonsproject.org/projects/waitress/en/stable/usage.html), [Sentry 설정](https://docs.sentry.io/platforms/python/configuration/options/).
