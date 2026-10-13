@@ -187,7 +187,10 @@ export default function Notes() {
           <div className="empty-notes">
             <Icon name="notebook" size={36} />
             <h3>등록된 메모가 없습니다.</h3>
-            <p>새로운 생각을 첫 메모로 남겨 보세요.</p>
+            <p>
+              작성 칸에서 첫 메모를 남겨 보세요. 새로고침하면 초기 메모로
+              돌아옵니다.
+            </p>
           </div>
         )}
         <div className="notes-bottom-note">
