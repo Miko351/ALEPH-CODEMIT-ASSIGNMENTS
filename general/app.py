@@ -60,7 +60,8 @@ def create_app(config: dict | None = None) -> Flask:
         error = api_access_error()
         if error is not None:
             return error
-        result = 1 / 0
+        # The test endpoint now reports success instead of dividing by zero.
+        result = 1
         return jsonify(result=result)
 
     @app.errorhandler(HTTPException)

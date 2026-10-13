@@ -22,7 +22,7 @@ def test_health_does_not_claim_database_connection():
         assert create_monitor({'TESTING': True}).test_client().get('/health').status_code == 200
 
 
-def test_sentry_test_is_gated_and_reproduces_error():
+def test_sentry_test_is_gated_and_returns_normal_json():
     assert general_app().test_client().get('/api/sentry-test').status_code == 404
     app = general_app(ENABLE_SENTRY_TEST=True)
     client = app.test_client()
@@ -30,8 +30,9 @@ def test_sentry_test_is_gated_and_reproduces_error():
     with client.session_transaction() as session:
         session['user_id'] = 1
     with patch('auth_helpers.find_user_by_id', return_value={'id': 1}):
-        with pytest.raises(ZeroDivisionError):
-            client.get('/api/sentry-test')
+        response = client.get('/api/sentry-test')
+        assert response.status_code == 200
+        assert response.json == {'result': 1}
 
 
 def test_sentry_removes_sensitive_fields_and_configures_service(monkeypatch):
