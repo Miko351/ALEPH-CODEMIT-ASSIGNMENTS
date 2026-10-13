@@ -52,7 +52,7 @@ volumes:
   general-data:
 networks:
   general-web:
-    internal: true
+    driver: bridge
   general-data:
     internal: true
   events:

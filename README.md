@@ -77,7 +77,7 @@ docker compose -f compose-general.yaml up -d
 | monitor-api | 감시 web, 감시 data, m5d1-events | 5000 | 없음 |
 | monitor-db | 감시 data | 5432 | 없음 |
 
-일반·감시 web/data는 프로젝트별 망이며 `internal: true`다. DB는 자기 data 망에만 참여한다. 각 API의 DB_HOST는 자기 DB 서비스 이름이고 포트·DB 이름·계정·비밀번호는 자기 DB 설정과 일치한다. DB 연결은 psycopg, SQL 입력은 매개변수 바인딩을 사용한다. general/sql/docker-init.sql에 posts·users가, monitor/backend/sql/docker-init.sql에 users·events·notes·처리 상태·event_kind가 준비된다.
+일반·감시 web/data는 프로젝트별 망이다. PC 공개 포트를 사용하는 web 망은 `driver: bridge`, DB용 data 망은 `internal: true`다. DB는 자기 data 망에만 참여한다. 각 API의 DB_HOST는 자기 DB 서비스 이름이고 포트·DB 이름·계정·비밀번호는 자기 DB 설정과 일치한다. DB 연결은 psycopg, SQL 입력은 매개변수 바인딩을 사용한다. general/sql/docker-init.sql에 posts·users가, monitor/backend/sql/docker-init.sql에 users·events·notes·처리 상태·event_kind가 준비된다.
 
 두 API만 events 공유 망에 참여하며 두 파일 모두 `external: true`, 실제 `name: m5d1-events`를 선언한다. YAML 안의 같은 별칭(events)만 쓰면 기본적으로 프로젝트마다 별도 망이 생긴다. 같은 실제 외부 망을 지정하고 서비스 networks에도 참여시켜야 서로의 서비스 이름으로 연결할 수 있다. 다른 Compose의 서비스는 depends_on에 넣지 않았다.
 
@@ -139,9 +139,26 @@ general-db는 같은 일반 data 망에 있으므로 이름 조회가 된다. mo
 
 ## 로컬 검증과 Git 제출
 
-현재 PC에는 Docker가 없어 사용자가 직접 설치하기로 했다. 따라서 Docker build/up, config --quiet, gateway 동작, 공유 망 DNS, down/up 볼륨 보존은 **아직 실제 실행하지 않았다**. 위 명령은 Docker 설치 후 수행할 절차다. 이 문서는 컨테이너 실행 완료를 주장하지 않는다.
+2026-10-13 Docker Desktop 4.95.0의 Linux 엔진 29.8.2, Docker Compose 5.6.0에서 실제 실행 검증을 완료했다. 두 config --quiet 통과 → 공유 망 생성 → 감시 이미지 build/up → `/api/auth/me` 200 → 계정 준비 → 일반 이미지 build/up 순서로 실행했다. Next.js도 Docker 빌드 안에서 production build하고 컨테이너의 npm run start로 실행했다.
 
-로컬에서는 Next.js lint·production build를 통과했고, PyYAML 설정 검사·Python 문법·빌드 경로 검사 및 별도 PostgreSQL 테스트 DB에서 로그인·기록 저장·메모 CRUD·Flask 앱 재생성 후 데이터 조회 테스트 3개를 통과했다. 해당 테스트의 기록 전송은 Flask 테스트 클라이언트로 collector에 전달하며 Docker 네트워크 전송 검증을 대신하지 않는다. 기존 과제 DB 자료는 변경하지 않았다.
+첫 실제 실행에서 web 망의 internal 설정 때문에 gateway의 호스트 포트가 게시되지 않는 문제를 확인했다. 두 web 망을 일반 bridge로 수정하고 DB의 internal 망은 유지했다. 최종 ps에서는 gateway만 8081·8082가 공개되고, DB·API·Next.js는 내부 포트만 표시된다. inspect의 m5d1-events에는 두 API만 참여한다. 일반 API에서 monitor-api와 general-db 이름은 조회되며 monitor-db 이름은 조회되지 않는 것도 확인했다.
+
+실제 gateway 주소에 접속하는 Playwright 브라우저 테스트는 **1 passed (3.1s)**였다. 일반 로그인 실패·성공 후 감시 화면에서 login_failure·401, login_success·200을 확인했다. 제목 Docker 점검, 내용 로그인 실패와 성공을 확인했다를 DB에 저장하고 브라우저 새로고침 후 상세를 다시 조회했다. 이후 **-v 없이 두 Compose를 각각 down하고 감시→일반 순서로 up**했다. 두 named volume이 유지되고, 다시 로그인한 API에서 기존 기록 ID 5·6과 메모 ID 1의 제목·본문이 그대로 조회됨을 확인했다.
+
+로컬의 Next.js lint·production build와 별도 PostgreSQL 앱 테스트 3개도 통과했다. 네트워크 수정 뒤 배포 설정 테스트 2개를 다시 통과했다. Flask 테스트 클라이언트 기반 검증에 더해 위 Docker 브라우저 테스트는 실제 HTTP·공유 망·DB·gateway·화면을 사용했다. 기존 과제 DB 자료는 변경하지 않았다.
+
+Docker 실행 상태에서 화면·데이터 보존 검증을 재현하려면 다음을 실행한다. 첫 명령은 테스트용 Docker 점검 메모를 저장하며, 마지막 명령은 이 프로젝트의 두 Compose만 down/up하고 저장된 ID를 확인한다. 기존 자료와 볼륨을 삭제하지 않는다.
+
+```cmd
+cd /d D:\ALEPH_Codemit\mini-watch-compose\monitor\next-frontend
+npm ci
+npx playwright install chromium
+npm test
+cd ..\..\..
+.venv\Scripts\python.exe scripts\verify_persistence.py
+```
+
+마지막 스크립트는 아래 Python 가상환경·requirements-dev 설치가 필요하다. 스크립트 없이 위의 화면 확인 및 수동 down/up 단계로도 같은 내용을 검증할 수 있다.
 
 ```cmd
 python -m venv .venv
@@ -169,7 +186,7 @@ ZIP은 scripts/package.py로 생성하며 소스·Compose·Dockerfile·.dockerig
 - PR: [https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/7](https://github.com/Miko351/ALEPH-CODEMIT-ASSIGNMENTS/pull/7). base=`mini-watch-compose`, 상태 `MERGED`, 병합 시각 `2026-10-13T03:56:45Z`.
 - merge commit: `49503741dcc4b3825e933cf52be392b2cc639cda`. 부모 2개인 merge commit으로 병합했다. 로컬 mini-watch-compose에서 pull --ff-only 후 완료한 개선 브랜치를 로컬·원격에서 삭제.
 
-실제 PR diff를 읽어 확인한 검토 내용은 PR 본문에도 남겼다. 아래는 해당 본문이다. 외부 리뷰어의 승인이라고 주장하지 않고 작성자가 변경 내용을 점검한 기록이다.
+실제 PR diff를 읽어 확인한 검토 내용은 PR 본문에도 남겼다. 아래는 Docker 설치 전 작성한 당시의 본문이며, 현재 실제 실행 결과는 위 로컬 검증 절에 갱신했다. 외부 리뷰어의 승인이라고 주장하지 않고 작성자가 변경 내용을 점검한 기록이다.
 
 ```text
 감시 gateway가 Next.js 프로세스 생성 직후 시작하면 HTTP 준비 전에 일시적인 502가 발생할 수 있습니다. monitor-web에 Node.js fetch 기반 HTTP healthcheck를 추가하고 monitor-gateway의 의존 조건을 service_healthy로 변경했습니다.

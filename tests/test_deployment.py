@@ -17,6 +17,8 @@ def test_compose_isolation_and_persistence():
         assert data['name'] == f'm5d1-{role}'
         assert set(data['services']) == expected
         assert data['networks']['events'] == {'external': True, 'name': 'm5d1-events'}
+        assert data['networks'][f'{role}-web'] == {'driver': 'bridge'}
+        assert data['networks'][f'{role}-data']['internal'] is True
         services = data['services']
         db, api, gateway = [services[f'{role}-{name}'] for name in ('db', 'api', 'gateway')]
         assert db['networks'] == [f'{role}-data']
