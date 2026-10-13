@@ -6,7 +6,7 @@ export default defineConfig({
   timeout: 90000,
   expect: { timeout: 10000 },
   use: {
-    baseURL: "http://localhost:8082",
+    baseURL: process.env.MONITOR_BASE_URL || "http://localhost:8082",
     headless: true,
     trace: "retain-on-failure",
   },

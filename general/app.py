@@ -19,7 +19,6 @@ def create_app(config: dict | None = None) -> Flask:
     load_dotenv(Path(__file__).with_name(".env"), override=False, interpolate=False)
     app = Flask(__name__)
     app.config.from_mapping(
-        DATABASE_URL=os.getenv("DATABASE_URL"),
         DB_HOST=os.getenv("DB_HOST", "general-db"),
         DB_PORT=os.getenv("DB_PORT", "5432"),
         DB_NAME=os.getenv("DB_NAME", "general"),

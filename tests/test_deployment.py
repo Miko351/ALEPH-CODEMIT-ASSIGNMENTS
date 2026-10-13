@@ -54,14 +54,15 @@ def test_compose_isolation_and_persistence():
 
 def test_build_commands_and_gateway_routes():
     package = json.loads((ROOT / 'monitor/next-frontend/package.json').read_text())
-    assert package['scripts']['start'] == 'next start --hostname 0.0.0.0 --port 3000'
+    assert package['scripts']['start'] == 'next start --hostname 0.0.0.0'
     dockerfile = (ROOT / 'monitor/next-frontend/Dockerfile').read_text()
     assert 'npm ci' in dockerfile and 'npm run build' in dockerfile and '"start"' in dockerfile
-    for role in ('general', 'monitor'):
-        conf = (ROOT / f'gateways/{role}.conf').read_text()
-        assert f'http://{role}-api:5000;' in conf
+    assert 'http://general-api:5000;' in (ROOT / 'gateways/general.conf').read_text()
     monitor = (ROOT / 'gateways/monitor.conf').read_text()
-    assert 'location /api/' in monitor and 'http://monitor-web:3000;' in monitor
+    assert 'http://monitor-web:3000;' in monitor and 'http://monitor-api:5000;' not in monitor
+    assert (ROOT / 'monitor/next-frontend/app/api/[...path]/route.js').is_file()
+    for folder in ('general', 'monitor/backend'):
+        assert 'waitress-serve' in (ROOT / folder / 'Dockerfile').read_text()
     for source in ROOT.rglob('*.py'):
         if not any(part in {'.venv', '.cache', 'node_modules'} for part in source.parts):
             ast.parse(source.read_text(encoding='utf-8'))

@@ -17,6 +17,9 @@ def main():
     if not state_file.is_file():
         raise SystemExit('Run the Docker browser test first to create the persistence checkpoint.')
     state = json.loads(state_file.read_text())
+    password = os.getenv('TEST_ACCOUNT_PASSWORD')
+    if not password:
+        raise SystemExit('Set TEST_ACCOUNT_PASSWORD for your local test accounts.')
 
     def compose(role, *args):
         subprocess.run([executable, 'compose', '-f', f'compose-{role}.yaml', *args], cwd=ROOT, check=True)
@@ -31,7 +34,8 @@ def main():
     assert response.status_code == 200
     compose('general', 'up', '-d')
     monitor = requests.Session()
-    assert monitor.post('http://localhost:8082/api/auth/login', json={'username': 'operator', 'password': 'Learn123!'}, timeout=10).status_code == 200
+    token = monitor.get('http://localhost:8082/api/auth/me', timeout=10).json()['csrf_token']
+    assert monitor.post('http://localhost:8082/api/auth/login', json={'username': 'operator', 'password': password}, headers={'X-CSRF-Token': token}, timeout=10).status_code == 200
     detail = monitor.get(f"http://localhost:8082/api/notes/{state['noteId']}", timeout=10)
     assert detail.status_code == 200
     assert detail.json()['note']['title'] == 'Docker 점검'
@@ -39,7 +43,7 @@ def main():
     events = monitor.get('http://localhost:8082/api/events', timeout=10).json()['events']
     assert set(state['eventIds']) <= {event['id'] for event in events}
     general = requests.Session()
-    assert general.post('http://localhost:8081/auth/login', json={'username': 'student', 'password': 'Learn123!'}, timeout=10).status_code == 200
+    assert general.post('http://localhost:8081/auth/login', json={'username': 'student', 'password': password}, timeout=10).status_code == 200
     assert general.get('http://localhost:8081/', timeout=10).status_code == 200
     print(f"두 프로젝트 down/up 후 로그인 기록 {state['eventIds']}와 메모 #{state['noteId']} 보존 확인; 볼륨 삭제 없음.")
 
