@@ -16,3 +16,6 @@ playwright-report/
 *.zip
 *.db
 *.sqlite*
+monitor/backend/learning/data/*.json
+*.pcap
+*.pcapng

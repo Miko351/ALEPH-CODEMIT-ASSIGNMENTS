@@ -35,6 +35,9 @@ services:
       MONITOR_URL: http://monitor-api:5000/api/events
       HOST: 0.0.0.0
       PORT: "5000"
+    volumes:
+      - ./general/app.py:/app/app.py:ro
+      - ./general/request_logging.py:/app/request_logging.py:ro
     depends_on:
       general-db:
         condition: service_healthy

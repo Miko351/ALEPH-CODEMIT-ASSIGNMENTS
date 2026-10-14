@@ -15,3 +15,6 @@ instance
 tests
 test-results
 playwright-report
+learning/data/*.json
+*.pcap
+*.pcapng

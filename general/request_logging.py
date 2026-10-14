@@ -25,23 +25,26 @@ def register_request_logging(app) -> None:
     def start_timer():
         g.request_started = time.perf_counter()
 
-    @app.after_request
-    def record_request(response):
-        event = {
-            "event_kind": g.get("event_kind", "request"),
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "method": request.method,
-            "path": request.path,
-            "status_code": response.status_code,
-            "duration_ms": round((time.perf_counter() - g.request_started) * 1000, 2),
-        }
-        # Do not record form bodies, passwords or query strings.
-        logger.info(json.dumps(event, ensure_ascii=False))
-        monitor_url = app.config.get("MONITOR_URL") if request.path != "/health" else None
-        if monitor_url:
-            try:
-                result = requests.post(monitor_url, json=event, headers={"X-Event-Token": app.config["EVENT_TOKEN"]}, timeout=3)
-                result.raise_for_status()
-            except requests.RequestException:
-                app.logger.warning("감시 서버로 요청 기록을 보내지 못했습니다.")
-        return response
+def record_request(response):
+    from flask import current_app
+    app = current_app
+    event = {
+        "event_kind": g.get("event_kind", "request"),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "method": request.method,
+        "path": request.path,
+        "status_code": response.status_code,
+        "duration_ms": round((time.perf_counter() - g.request_started) * 1000, 2),
+    }
+    # stdout and HTTP delivery are separate; neither logs passwords or bodies.
+    serialized = json.dumps(event, ensure_ascii=False)
+    print(serialized, flush=True)
+    app.extensions["request_logger"].info(serialized)
+    monitor_url = app.config.get("MONITOR_URL") if request.path != "/health" else None
+    if monitor_url:
+        try:
+            result = requests.post(monitor_url, json=event, headers={"X-Event-Token": app.config["EVENT_TOKEN"]}, timeout=3)
+            result.raise_for_status()
+        except requests.RequestException:
+            app.logger.warning("감시 서버로 요청 기록을 보내지 못했습니다.")
+    return response

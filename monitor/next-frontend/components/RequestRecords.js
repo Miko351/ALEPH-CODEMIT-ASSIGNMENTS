@@ -32,7 +32,7 @@ export default function RequestRecords() {
     };
   }, []);
   const visible = events.filter((event) =>
-    `${event.path} ${event.status_code} ${event.event_kind}`.includes(
+    `${event.path} ${event.status_code} ${event.event_type || event.event_kind}`.includes(
       query.trim(),
     ),
   );
@@ -77,7 +77,7 @@ export default function RequestRecords() {
           <tbody>
             {visible.map((event) => (
               <tr key={event.id}>
-                <td>{event.event_kind}</td>
+                <td>{event.event_type || event.event_kind}</td>
                 <td>{event.method}</td>
                 <td>{event.path}</td>
                 <td>{event.status_code}</td>

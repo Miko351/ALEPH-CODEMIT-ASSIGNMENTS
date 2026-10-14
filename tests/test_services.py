@@ -105,3 +105,29 @@ def test_login_events_notes_and_app_restart(databases, tmp_path):
     assert len(restarted.get('/api/events').json['events']) == len(events)
     assert restarted.delete(f'/api/notes/{note_id}', headers={'X-CSRF-Token': login.json['csrf_token']}).status_code == 200
     assert restarted.get(f'/api/notes/{note_id}').status_code == 404
+
+
+def test_actual_repository_receive_time_and_observation_window(databases):
+    from datetime import timedelta
+    from monitor.backend.db import connect_db
+    from monitor.backend.repositories import events
+    from monitor.backend.event_rules import make_event
+    with monitor_app(databases['monitor']).app_context():
+        boundary = events.last_id()
+        before = events.database_time()
+        saved = events.create_event(make_event({'method': 'GET', 'path': '/', 'status_code': 200, 'timestamp': '1900-01-01T00:00:00+00:00'}))
+        after = events.database_time()
+        assert before <= saved['occurred_at'] <= after
+        assert saved['id'] > boundary
+        live = events.read_after(boundary, reference_time=after)
+        assert [row['id'] for row in live] == [saved['id']]
+        with connect_db() as conn:
+            for offset in (-61, -60, 1):
+                conn.execute(
+                    "INSERT INTO http_events (occurred_at, method, path, status_code, duration_ms, event_kind, event_type) VALUES (%s, 'GET', '/', 200, 0, 'request', 'post_list')",
+                    (after + timedelta(seconds=offset),),
+                )
+        selected = events.read_after(boundary, reference_time=after)
+        assert len(selected) == 2
+        assert all(after - timedelta(seconds=60) <= row['occurred_at'] <= after for row in selected)
+        assert events.last_id() > boundary  # New observation never deletes the old rows.

@@ -5,6 +5,7 @@ import * as api from "../api/notes";
 import Icon from "./Icon";
 import DeleteDialog from "./DeleteDialog";
 import RequestRecords from "./RequestRecords";
+import AnalysisClient from "./AnalysisClient";
 
 const statuses = {
   pending: "확인 전",
@@ -244,6 +245,7 @@ export default function DatabaseNotes({ showRecords = false }) {
         </p>
       )}
       {showRecords && <RequestRecords />}
+      {showRecords && <AnalysisClient />}
       <div className="notes-workspace">
         <aside className="note-compose">
           <div className="compose-heading">

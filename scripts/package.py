@@ -18,21 +18,27 @@ def main():
                 'deployment-plan.md', 'general/sql/deploy.sql', 'monitor/backend/sql/deploy.sql',
                 'general/.env.example', 'monitor/backend/.env.example', 'monitor/next-frontend/.env.example',
                 'monitor/next-frontend/app/api/[...path]/route.js', 'general/observability.py', 'monitor/backend/observability.py'}
+    required.update({'monitor/backend/event_rules.py', 'monitor/backend/routes/analysis.py',
+                     'monitor/backend/learning/capture_case.py', 'monitor/backend/learning/normalize.py',
+                     'monitor/backend/learning/http_rules.py', 'monitor/backend/learning/report.py',
+                     'monitor/next-frontend/components/AnalysisClient.js'})
     assert required <= set(names)
     for name in names:
         path = Path(name)
         assert not any(part in PRIVATE or (part.startswith('.env') and part != '.env.example') for part in path.parts)
         assert path.suffix not in {'.zip', '.log', '.db', '.pyc', '.sqlite'}
+        assert path.suffix not in {'.pcap', '.pcapng'}
+        assert not (path.suffix == '.json' and 'learning/data' in path.as_posix())
         if path.suffix == '.py':
             ast.parse((ROOT / path).read_text(encoding='utf-8'))
-    target = ROOT / 'mini-watch-cloud.zip'
+    target = ROOT / 'mini-watch-analysis.zip'
     with zipfile.ZipFile(target, 'w', zipfile.ZIP_DEFLATED) as archive:
         for name in names:
-            archive.write(ROOT / name, f'mini-watch-cloud/{name}')
+            archive.write(ROOT / name, f'mini-watch-analysis/{name}')
     with zipfile.ZipFile(target) as archive:
         assert archive.testzip() is None
         for name in names:
-            assert archive.read(f'mini-watch-cloud/{name}') == (ROOT / name).read_bytes()
+            assert archive.read(f'mini-watch-analysis/{name}') == (ROOT / name).read_bytes()
     print(f'{target.name}: {len(names)} files, {target.stat().st_size} bytes; ZIP CRC and source equality verified.')
 
 

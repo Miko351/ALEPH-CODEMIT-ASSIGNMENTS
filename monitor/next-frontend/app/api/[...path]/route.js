@@ -6,7 +6,7 @@ async function forward(request, context) {
   // 앱 화면이 사용하는 경로만 전달한다. 이벤트 수신 POST는 일반 서버 전용이다.
   const resource = path.join("/");
   const allowed =
-    /^(auth\/(me|login|logout)|events|notes(\/\d+)?|sentry-test)$/.test(
+    /^(auth\/(me|login|logout)|events|notes(\/\d+)?|analysis(\/start)?|sentry-test)$/.test(
       resource,
     );
   if (!allowed || (resource === "events" && request.method !== "GET")) {

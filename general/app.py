@@ -7,7 +7,7 @@ from flask import Flask, render_template, jsonify
 import psycopg
 from werkzeug.exceptions import HTTPException
 
-from request_logging import register_request_logging
+from request_logging import register_request_logging, record_request
 from routes.posts import blueprint as posts_blueprint
 from routes.auth import blueprint as auth_blueprint
 from db import connect_db
@@ -46,6 +46,7 @@ def create_app(config: dict | None = None) -> Flask:
     app.register_blueprint(auth_blueprint)
     app.register_blueprint(posts_blueprint)
     register_request_logging(app)
+    app.after_request(record_request)
 
     @app.get("/health")
     def health():

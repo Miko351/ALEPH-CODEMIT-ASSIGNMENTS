@@ -15,6 +15,7 @@ from monitor.backend.routes.auth import blueprint as auth_blueprint
 from monitor.backend.routes.events import blueprint as events_blueprint
 from monitor.backend.routes.notes import blueprint as notes_blueprint
 from monitor.backend.observability import configure_errors
+from monitor.backend.routes.analysis import blueprint as analysis_blueprint
 
 
 def create_app(config=None):
@@ -45,7 +46,7 @@ def create_app(config=None):
     if len(app.config["EVENT_TOKEN"]) < 32 or app.config["EVENT_TOKEN"].startswith("CHANGE_ME"):
         raise RuntimeError("EVENT_TOKEN을 32자 이상의 별도 값으로 설정하세요.")
     configure_errors("mini-monitor")
-    for blueprint in (auth_blueprint, events_blueprint, notes_blueprint):
+    for blueprint in (auth_blueprint, events_blueprint, notes_blueprint, analysis_blueprint):
         app.register_blueprint(blueprint)
 
     @app.get("/health")
